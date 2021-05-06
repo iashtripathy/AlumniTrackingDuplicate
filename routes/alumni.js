@@ -16,8 +16,6 @@ router.use(bodyParser.json());
 //
 router.get('/',function(req,res,next){
 
-    res.redirect('alumni/login');
-
     res.redirect('/alumni/signup');
 
 })
