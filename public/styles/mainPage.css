@@ -1,0 +1,71 @@
+*{
+    margin:0 auto;
+}
+body{
+    margin : auto;
+
+    display: flex;
+    justify-content : center;    
+    /*background-size:cover;*/
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    font-family: sans-serif;
+}
+.header,.footer{
+    background-color: rgb(62, 62, 145);
+}
+.header{
+
+    margin-top:0px;
+    margin-bottom:1vw;
+    width:60vw;
+    height:8%;
+}
+.footer{
+    width:60vw;
+    height:10%;
+}
+.gradutaionCap{
+    position:absolute;
+    width: 100px;
+    height:100px;
+    margin-left:5%;
+}
+.mainImage,.image{
+    width: 60vw;
+}
+.mainImage{
+    height : 45%;
+}
+.image{
+    height:100%;
+}
+.content{
+    height:40%;
+}
+.common{
+    width : 29.5vw;
+    height:100%;
+    background-color:blueviolet;
+    float : left;
+}
+.common::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+.news{
+    position:relative;
+    width : 100%;
+    height : 40%;
+    background-color: black;
+    margin-top :2vw;
+    margin-bottom : 1vw;
+}
+#left{
+    margin-right : 1vw;
+}
+#right,#left{
+    margin-top : 1vw;
+}
