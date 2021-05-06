@@ -15,11 +15,11 @@ router.use(bodyParser.json());
 
 //
 router.get('/',function(req,res,next){
-<<<<<<< HEAD
+
     res.redirect('alumni/login');
-=======
+
     res.redirect('/alumni/signup');
->>>>>>> bd5102a38a195cc780d136133078667941b408c9
+
 })
 router.get('/register',function(req,res,next){
     //console.log('indise');
@@ -39,11 +39,8 @@ router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],as
 
 /* GET users listing. */
 //authenticate.verifyUser,
-<<<<<<< HEAD
+
 router.get('/getdetails/:password',[presentVerifying,authenticate.verifyUser],(req,res,next) => {
-=======
-router.get('/getdetails/:password',authenticate.verifyUser,(req,res,next) => {
->>>>>>> bd5102a38a195cc780d136133078667941b408c9
   AlumniBasicDetails.find({alumniPassword:req.params.password})
   .then((users) => {
       res.statusCode = 200;
