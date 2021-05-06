@@ -9,14 +9,25 @@ localStorage = LocalStorage('./tokens');
 var ExtractJwt = require('passport-jwt').ExtractJwt; */
 var authenticate = require('../authenticate');
 
+const app = require('../app');
 var router = express.Router();
+
+//for faking a post request as put for updating data
+var methodOverride = require('method-override');
+router.use(methodOverride('_method'));
+
+
+
+
+
+
 router.use(bodyParser.json());
 
 
 //
 router.get('/',function(req,res,next){
 
-    res.redirect('/alumni/signup');
+    res.redirect('/alumni/login');
 
 })
 router.get('/register',function(req,res,next){
@@ -29,8 +40,10 @@ function presentVerifying(req,res,next){
   next();
 }
 router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],async function(req,res){
-  const alumni = await AlumniBasicDetails.findById(req.user._id).select(['-alumniPassword','-hashPassword','-alumniEmail']);
-  res.send(alumni); 
+  const alumni = await AlumniBasicDetails.findById(req.user._id).select(['-alumniPassword','-hashPassword']);
+  
+  res.render('displayAlumniDetails',{details : alumni});
+  //res.send(alumni); 
 });
 
 
@@ -127,19 +140,34 @@ router.post('/login',async function(req,res){
     }
 });
   
+router.get('/editDetails/:id',[presentVerifying,authenticate.verifyUser],async function(req,res){
+  const alumni = await AlumniBasicDetails.findById(req.params.id).select(['-alumniPassword','-hashPassword']);
+  //console.log(req.params.id);
 
-  
-/*router.put('/updateDetails',authenticate.verifyUser, (req, res, next) => {
-  AlumniBasicDetails.findByIdAndUpdate(req.params.dishId, {
+  res.render('editAlumniDetails',{details : alumni});
+});
+
+
+router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  console.log(req.body);
+  const { id } = req.params;
+  //console.log(req.params);
+  const update = await AlumniBasicDetails.findByIdAndUpdate(id, {
       $set: req.body
   }, { new: true })
-  .then((dish) => {
+  .then((users) => {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json(dish);
+      //res.redirect('/alumni/currentAlumniDetails');
+      res.json(users);
   }, (err) => next(err))
-  .catch((err) => next(err));
-}) */
+  .catch((err) => next(err))
+
+    
+  //res.redirect('/alumni/currentAlumniDetails');
+});
+
+
 router.get('/logout', (req, res) => {
   console.log(req.headers);
   if(localStorage.getItem('alumnitoken') == "undefined"){

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-var directorateSchema = new Schema({
+var adminSchema = new Schema({
     username: {
         type: String,
         required: true,
@@ -16,6 +16,6 @@ var directorateSchema = new Schema({
         type: String
     }
 });
-var directorateModel = mongoose.model('DirectorateLoginDetails', directorateSchema);
+var adminModel = mongoose.model('AdminLoginDetails', adminSchema);
 
-module.exports = directorateModel;
+module.exports = adminModel;

@@ -12,7 +12,7 @@ exports.getToken = function(user) {
 
 exports.verifyUser = function(req,res,next){
     //const token = req.header('x-auth-token');
-    console.log("Name "+req.name);   
+    //console.log("Name "+req.name);   
     var token = '';
     if(req.name == "undefined"){
 
@@ -20,13 +20,10 @@ exports.verifyUser = function(req,res,next){
     else if(req.name == 'alumni'){
         token = localStorage.getItem('alumnitoken');
     }
-    else if(req.name == 'collegeAdmin'){
-        token = localStorage.getItem('collegeAdmintoken');
+    else if(req.name == 'admin'){
+        token = localStorage.getItem('admintoken');
     }
-    else if(req.name == 'directorate'){
-        token = localStorage.getItem('directoratetoken');
-    } 
-    console.log(token);
+    //console.log(token);
     if(!token){
         res.statusCode = 400;
         res.setHeader('Content-Type','application/json');

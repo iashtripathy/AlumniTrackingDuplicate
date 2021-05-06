@@ -27,6 +27,11 @@ var alumniBasicDetailsSchema = new Schema({
     },
     hashPassword:{
         type:String
+    },
+    role: {
+        type: String,
+        default: 'alumni',
+        enum: ["alumni" , "admin"]
     }
 });
 
