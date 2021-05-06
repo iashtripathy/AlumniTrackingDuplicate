@@ -43,13 +43,7 @@ var alumniDetailsSchema = new Schema({
     designation: {
         type: String,
         required: true
-    },
-    role: {
-        type: String,
-        default: 'basic',
-        enum: ["basic", "supervisor", "admin"]
-    },
-
+    }
 });
 var alumniDetails = mongoose.model('AlumniDetails', alumniDetailsSchema);
 
