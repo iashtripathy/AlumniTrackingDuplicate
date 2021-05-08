@@ -48,11 +48,14 @@ function presentVerifying(req,res,next){
 }); */
 
 router.get('/getusers',[presentVerifying,authenticate.verifyUser],async function(req,res,next){
-  const users = await AlumniBasicDetails.find({});
-  res.status(200).json({
+  const users = await AlumniBasicDetails.find({}).select(['-alumniPassword','-hashPassword']);
+/*   res.status(200).json({
     data: users
-  });
-  res.send(data); 
+  }); */
+  //console.log(users);
+  //JSON.stringify()
+  res.render('listAlumni',{records : users});
+  //res.send(data); 
 });
 
 

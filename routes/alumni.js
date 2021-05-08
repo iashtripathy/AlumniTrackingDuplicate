@@ -1,8 +1,17 @@
+if(process.env.NODE_ENV !=="production"){
+  require('dotenv').config();
+}
+
+
 var express = require('express');
 const bodyParser = require('body-parser');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
 var passport = require('passport');
 var bcrypt = require('bcrypt');
+var multer = require('multer');
+
+const { storage } = require('../cloudinary');
+
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = LocalStorage('./tokens');
 /* var JwtStrategy = require('passport-jwt').Strategy;
@@ -17,6 +26,8 @@ var methodOverride = require('method-override');
 router.use(methodOverride('_method'));
 
 
+
+var upload = multer({storage}); 
 
 
 
@@ -69,7 +80,7 @@ router.get('/getdetails/:password',[presentVerifying,authenticate.verifyUser],(r
 
 router.post('/register/basic', (req, res, next) => {
     console.log("Registrating");
-    console.log(req.body);
+    //console.log(req.body);
     AlumniBasicDetails.findOne({collegeName:req.body.collegeName, alumniRollNo:req.body.rollNo},async function(err,alumni){
       if(err) {
         console.log("inside");
@@ -84,7 +95,8 @@ router.post('/register/basic', (req, res, next) => {
         res.json({success: false,status:'Alumni already exist'});
       }
       else{
-        newAlumni = new AlumniBasicDetails({collegeName: req.body.collegeName, alumniName: req.body.alumniName, alumniRollNo: req.body.rollNo, alumniEmail:req.body.email, alumniPassword:req.body.password, hashPassword:req.body.password});
+        const image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1620374983/Alumni/r1mlxaidfzxhayczkgsn.png' , filename: 'Alumni/r1mlxaidfzxhayczkgsn' };
+        newAlumni = new AlumniBasicDetails({collegeName: req.body.collegeName, alumniName: req.body.alumniName, alumniRollNo: req.body.rollNo, alumniEmail:req.body.email, alumniImage : image ,alumniPassword:req.body.password, hashPassword:req.body.password});
         const salt = await bcrypt.genSalt(10);
         newAlumni.hashPassword = await bcrypt.hash(newAlumni.alumniPassword,salt);
         await newAlumni.save((err)=>{
@@ -148,12 +160,28 @@ router.get('/editDetails/:id',[presentVerifying,authenticate.verifyUser],async f
 });
 
 
-router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
-  console.log(req.body);
+router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser],upload.single('profilePic'), async (req, res, next) => {
+  //console.log(req);
+  //req.files.map(f =>({url : f.path, f.filename}))
+  let image;
+  console.log(req.file,req.params.id);
+  if(typeof req.file!=="undefined"){
+    image = { url:req.file.path , filename:req.file.filename}
+  }
+  else{
+    const alumni = await AlumniBasicDetails.findById(req.params.id);
+    //console.log(alumni)
+    //console.log(alumni.alumniImage.url)
+    //console.log(alumni.alumniImage.filename)
+    image = { url: alumni.alumniImage.url , filename:alumni.alumniImage.filename }
+  }
+  
+ 
   const { id } = req.params;
   //console.log(req.params);
   const update = await AlumniBasicDetails.findByIdAndUpdate(id, {
-      $set: req.body
+      $set: req.body,
+      alumniImage : image
   }, { new: true })
   .then((users) => {
       res.statusCode = 200;

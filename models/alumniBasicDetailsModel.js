@@ -14,11 +14,16 @@ var alumniBasicDetailsSchema = new Schema({
     alumniRollNo: {
         type: String,
         required: true,
+        unique : true
     },
     alumniEmail:{
         type: String,
         required: true,
         unique: true
+    },
+    alumniImage:{
+        url : String,
+        filename : String
     },
     alumniPassword: {
         type: String,
@@ -27,11 +32,6 @@ var alumniBasicDetailsSchema = new Schema({
     },
     hashPassword:{
         type:String
-    },
-    role: {
-        type: String,
-        default: 'alumni',
-        enum: ["alumni" , "admin"]
     }
 });
 
