@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <title>Document</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet"  type="text/css" href="../public/styles/listAlumni.css">
@@ -38,13 +42,22 @@
                                     <img class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
                                 </div>
                                 <div class="media-body">
-                                    <h4 class="media-heading"><%=records[i].alumniName%> <small>Software Engineer at Facebook, Inc.</small></h4>
+                                    <h4 class="media-heading">
+                                        <%=records[i].alumniName%> 
+                                    <small>Software Engineer at Facebook, Inc.</small>
+                                    <form class="deleteform" action="/admin/deleteuser/<%=records[i]._id%>?_method=DELETE" method="post">
+                                        <i class="fa fa-trash deleteuser" style="float:right;"></i>
+                                    </form>
+                                </h4>
                                     <div class="media-content">
                                         <i class="fa fa-map-marker"></i> San Francisco, California, United States
+                                        
+                                        
                                         <ul class="list-unstyled">
                                             <li><i class="fa fa-skype"></i> <%=records[i].alumniRollNo%></li>
-                                            <li><i class="fa fa-mobile"></i> +63 912 212 2451</li>
+                                            <li><i class="fa fa-mobile"></i> 8790456720</li>
                                             <li><i class="fa fa-envelope-o"></i> <%=records[i].alumniEmail%></li>
+                                            
                                         </ul>
                                     </div>
                                 </div>
@@ -78,6 +91,9 @@
               $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
           });
+        });
+        $(".deleteuser").click(function(){
+            $(".deleteform").submit();
         });
     </script>
 </body>

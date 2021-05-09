@@ -319,3 +319,9 @@ CONTACT MODAL VIEW
     border: 1px solid #ddd;
     margin-bottom: 12px;
   }
+.list-group-item{
+    padding:15px;
+}
+.pull-left{
+    padding-right:15px;
+}

@@ -11,6 +11,7 @@ var bcrypt = require('bcrypt');
 var multer = require('multer');
 
 const { storage } = require('../cloudinary');
+const { cloudinary } = require('../cloudinary');
 
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = LocalStorage('./tokens');
@@ -164,19 +165,18 @@ router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser],uploa
   //console.log(req);
   //req.files.map(f =>({url : f.path, f.filename}))
   let image;
+  const alumni = await AlumniBasicDetails.findById(req.params.id);
+  oldImageFileName = alumni.alumniImage.filename;
   console.log(req.file,req.params.id);
   if(typeof req.file!=="undefined"){
     image = { url:req.file.path , filename:req.file.filename}
+    await cloudinary.uploader.destroy(oldImageFileName);
   }
   else{
-    const alumni = await AlumniBasicDetails.findById(req.params.id);
-    //console.log(alumni)
-    //console.log(alumni.alumniImage.url)
-    //console.log(alumni.alumniImage.filename)
+    //const alumni = await AlumniBasicDetails.findById(req.params.id);
     image = { url: alumni.alumniImage.url , filename:alumni.alumniImage.filename }
   }
   
- 
   const { id } = req.params;
   //console.log(req.params);
   const update = await AlumniBasicDetails.findByIdAndUpdate(id, {

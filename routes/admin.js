@@ -10,9 +10,14 @@ localStorage = LocalStorage('./tokens');
 var ExtractJwt = require('passport-jwt').ExtractJwt; */
 var authenticate = require('../authenticate');
 
+const { cloudinary } = require('../cloudinary');
+
 var router = express.Router();
 router.use(bodyParser.json());
 
+
+var methodOverride = require('method-override');
+router.use(methodOverride('_method'));
 
 //
 router.get('/',function(req,res,next){
@@ -54,6 +59,7 @@ router.get('/getusers',[presentVerifying,authenticate.verifyUser],async function
   }); */
   //console.log(users);
   //JSON.stringify()
+  //console.log(users);
   res.render('listAlumni',{records : users});
   //res.send(data); 
 });
@@ -194,6 +200,37 @@ router.post('/login',async function(req,res){
   }, (err) => next(err))
   .catch((err) => next(err));
 }) */
+
+
+ 
+router.delete('/deleteuser/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  const id = req.params.id;
+  console.log(id);
+
+  //for deleting the alumni image from the cloudinary database
+  const alumni = await AlumniBasicDetails.findById(req.params.id);
+  imageFilename = alumni.alumniImage.filename;
+  //await cloudinary.uploader.destroy(imageFilename);
+
+  
+  //await AlumniBasicDetails.findByIdAndDelete(id);
+  //res.send(result);
+  //res.redirect('/admin/getusers');
+  //console.log(AlumniBasicDetails);
+  await AlumniBasicDetails.findOneAndRemove({_id: id },
+    function (err, docs) {
+      if (err){
+        console.log(err)
+      }
+      else{
+        console.log("Removed User : ", docs);
+      }
+});
+
+
+  res.redirect('/');
+});
+
 router.get('/logout', (req, res) => {
   console.log(req.headers);
   if(localStorage.getItem('admintoken') == "undefined"){
