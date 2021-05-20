@@ -30,12 +30,11 @@ var passport = require('passport');
 
 /* var expressHbs = require('express-handlebars'); */
 
- 
+
+app.use(cookieParser());
+// app.use(express.json());
 
 
-
-
-app.listen(3000);
 
 // Connection URL
 const url = config.mongoUrl;
@@ -112,5 +111,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.send(err);
 });
+
+app.listen(3000, () => console.log('Server started'));
 
 module.exports = app;

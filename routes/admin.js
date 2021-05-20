@@ -175,10 +175,10 @@ router.post('/login',async function(req,res){
       else if(validPassword){
         //res.setHeader('Content-Type', 'application/json');
         var token = authenticate.getToken({_id: admin._id});
-         
-        localStorage.setItem('admintoken', token);
-
-        res.setHeader('Content-Type', 'application/json');
+        //res.setHeader('Content-Type', 'application/json');
+        //localStorage.setItem('admintoken', token);
+        res.cookie('admintoken', token);
+       
         res.send({success: true,status:'You are authenticated!',token:token});
         //res.send(alumni);
       }
@@ -233,15 +233,15 @@ router.delete('/deleteuser/:id',[presentVerifying,authenticate.verifyUser], asyn
 
 router.get('/logout', (req, res) => {
   console.log(req.headers);
-  if(localStorage.getItem('admintoken') == "undefined"){
+/*   if(localStorage.getItem('admintoken') == "undefined"){
     res.setHeader('Content-Type','application/json');
     res.json({status:"Already Logged Out"});
   }
-  else if (localStorage.getItem('admintoken')) {
-    localStorage.removeItem('admintoken');
+  else if (localStorage.getItem('admintoken')) { */
+    //localStorage.removeItem('admintoken');
     res.setHeader('Content-Type','application/json');
+    res.cookie('admintoken','');
     res.json({success: true,status:"Logged Out Successfully"});
-  }
 });
 
 module.exports = router;

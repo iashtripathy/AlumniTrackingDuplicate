@@ -10,8 +10,8 @@
   <meta content="" name="keywords">
 
 
-  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<!--   <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -56,14 +56,14 @@
     <div class="container d-flex align-items-center justify-content-between">
 
       <div class="logo">
-        <h1 class="text-light"><a href="/index">GVPCE Alumni Connect </a></h1>
+        <h1 class="text-light"><a href="/index">Serenity</a></h1>
         <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="/index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+        <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
       </div>
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class ="active" href="/index">Home</a></li>
+          <li><a href="/index">Home</a></li>
           <li class="dropdown"><a href="#"><span>About</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="/images">Images</a></li>
@@ -72,11 +72,16 @@
           </li>
           
           <li><a href="/events">Programs and Events</a></li>
-          <li><a class="active" href="/services">Career Opportunities</a></li>
+          <li><a class = "active" href="/services">Career Opportunities</a></li>
           <li><a href="/stories">Alumni Stories</a></li>
           <li><a href="/contact">Contact</a></li>
 
-          <li><a class="getstarted" href="/about">Get Started</a></li>
+          <% if(!logInStatus){ %>
+            <li><a class="getstarted" href="/alumni/login">Login</a></li>
+          <% } else{ %>  
+            
+            <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
+          <% } %>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->

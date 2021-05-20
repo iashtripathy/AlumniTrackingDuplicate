@@ -62,7 +62,12 @@
           <li><a href="/stories">Alumni Stories</a></li>
           <li><a href="/contact">Contact</a></li>
 
-          <li><a class="getstarted" href="/about">Get Started</a></li>
+          <% if(!logInStatus){ %>
+            <li><a class="getstarted" href="/alumni/login">Login</a></li>
+          <% } else{ %>  
+            
+            <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
+          <% } %>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->

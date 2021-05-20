@@ -13,16 +13,17 @@ exports.getToken = function(user) {
 exports.verifyUser = function(req,res,next){
     //const token = req.header('x-auth-token');
     //console.log("Name "+req.name);   
-    var token = '';
-    if(req.name == "undefined"){
-
-    }
-    else if(req.name == 'alumni'){
-        token = localStorage.getItem('alumnitoken');
-    }
-    else if(req.name == 'admin'){
-        token = localStorage.getItem('admintoken');
-    }
+    //console.log("TOKEN IS FOUND HERE-------",req.headers.authorization);
+    var token;
+    //console.log({token});
+     if(req.name == "undefined"){
+     }
+     else if(req.name == 'alumni'){
+        token = req.cookies.alumnitoken;
+     }
+     else if(req.name == 'admin'){
+        token = req.cookies.admintoken;
+     }
     //console.log(token);
     if(!token){
         res.statusCode = 400;
@@ -45,6 +46,8 @@ exports.verifyUser = function(req,res,next){
             res.json({success:false,status:'Invalid Token'});
         }
     }
+    // next();
+
     
     
 }

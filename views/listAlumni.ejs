@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <title>Document</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -39,7 +38,7 @@
                         <a href="#" class="list-group-item">
                             <div class="media">
                                 <div class="pull-left">
-                                    <img class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
+                                    <img id="makeround" class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
                                 </div>
                                 <div class="media-body">
                                     <h4 class="media-heading">
@@ -49,7 +48,7 @@
                                         <i class="fa fa-trash deleteuser" style="float:right;"></i>
                                     </form>
                                 </h4>
-                                    <div class="media-content">
+                                    <div style="margin-left:100px !important; " class="media-content">
                                         <i class="fa fa-map-marker"></i> San Francisco, California, United States
                                         
                                         
@@ -77,8 +76,7 @@
                         </ul>
                     </div>
                 </div>
-            </div>
-            
+            </div> 
         </div>
     </div>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>

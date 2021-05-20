@@ -1,11 +1,19 @@
-body{
+/* body{
     margin-top:20px;
     background:white;
     display:flex;
     justify-content: center;
     align-items: center;
-}
+} */
 
+
+
+#makeround{
+    border-radius : 50% !important;
+}
+#changemargin{
+    margin-left:100px !important;
+}
 .nav.nav-pills > li > a {
     color: #777;
     border-radius: 0!important;
