@@ -2,14 +2,40 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const jobSchema = Schema({
-    title: { type: String, required: true },
-    link: { type: String, required: true }, // no longer unique...
-    Experience: { type: String, required: true }, // validate on front end
-    notes: { type: String },
-    tags: { type: Array, default: [] },
-    uploadedByUserId: { type: Schema.Types.ObjectId, required: true },  
-    uploadedByUserName: { type: String, required: true},
-    created: { type: Date, default: Date.now },
+    title: { 
+        type: String, 
+        required: true 
+    },
+    link: { 
+        type: String, 
+        required: true 
+    }, // no longer unique...
+    experience: { 
+        type: String, 
+        required: true 
+    }, // validate on front end
+    location: { 
+        type: String , 
+        required: true
+    },
+
+    /*uploadedByname,companyname should be added*/
+    tags: { 
+        type: Array, 
+        default: [] 
+    },
+    uploadedByUserId: { 
+        type: String, 
+        required: true 
+    },  
+    companylogo: {  
+        url : String , 
+        filename : String
+    },
+    createdAt: { 
+        type: Date, 
+        default: Date.now 
+    },
 });
 
 var jobModel = mongoose.model('JobModel', jobSchema);

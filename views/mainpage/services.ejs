@@ -41,12 +41,18 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>  
 
-  <!-- =======================================================
-  * Template Name: Serenity - v4.1.0
-  * Template URL: https://bootstrapmade.com/serenity-bootstrap-corporate-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+<style>
+  @media screen and (max-width: 991px){
+    .col-lg-4{
+      margin-top:40px !important;
+    }
+  }
+  #nochange a{
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
+  }
+</style>
 </head>
 
 <body style="display:block;">
@@ -111,68 +117,109 @@
 
     <!-- ======= Services Section ======= -->
 
+    <section id="blog" class="blog">
+      <div class="container" data-aos="fade-up">
 
-    <div class="col-md-12" style="padding-bottom:60px;">
-      <div class="page-people-directory">
-          <div class="row">
-            
-              <div class="col-md-9">
-                  <div class="well" style="padding-bottom:0px;">
-                      <div class="row">
-                          <input class="form-control" id="myInput" type="text" placeholder="Search..">
-                          
+        <div class="row">
+
+          <div class="col-lg-8 entries">
+            <div class="list-group contact-group" id="myTable">
+              <% for(var i = 0; i < jobs.length; i++ ) {%>
+                <a href="<%= jobs[i].link %>" class="list-group-item">
+                  <div class="media">
+                    <div class="pull-left">
+                      <img id="makeround" class="img-circle" style="width:84px;height:80px;"src="<%= jobs[i].companylogo.url %>" alt="...">
+                    </div>
+                    <div class="media-body">
+                      <h4 class="media-heading">
+                        <%= jobs[i].title %> 
+                      </h4>
+                      <div style="margin-left:100px !important; " class="media-content">
+                        <i class="fa fa-map-marker"></i> <%= jobs[i].location %>
+                        <% if(user_type['admin']){ %>
+                        
+                          <form action="/deletejob/<%= jobs[i]._id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
+                            <button style="background:none;border:none;padding-left:10px" type="submit"><i class="fa fa-trash" style="color:red;" aria-hidden="true">&nbspDelete</i></button>
+                          </form>  
+                          </br>
+                        <% } else if( user_type['alumni'] && user_id === jobs[i].uploadedByUserId ){ %>  
+                          <form action="/alumni/editjob/<%= jobs[i]._id %>?_method=GET" method="GET" class="d-inline">
+                            <button style="background:none;border:none;padding-left:10px" type="submit"><i class="fa fa-edit" aria-hidden="true">&nbspEdit</i></button>
+                          </form>
+                          <form action="/deletejob/<%= jobs[i]._id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
+                            <button style="background:none;border:none;padding-left:10px" type="submit"><i class="fa fa-trash" style="color:red;" aria-hidden="true">&nbspDelete</i></button>
+                          </form>  
+                        <% } %> 
+
+
+                        </br>Min&nbspExperience&nbsp:&nbsp <%= jobs[i].experience %>&nbspYears
+
+
+                        
+       
                       </div>
+                    </div>
                   </div>
-                  <br>
-                  <div class="row">
-                      <div class="col-md-6">
-                          <h3>All Users</h3>
-                      </div>
-                     
-                  </div>
-                  
-                  <div class="list-group contact-group" id="myTable">
-                      <% for(var i = 0; i<records.length; i++ ) {%>
-                      <a href="#" class="list-group-item">
-                          <div class="media">
-                              <div class="pull-left">
-                                  <img class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
-                              </div>
-                              <div class="media-body">
-                                  <h4 class="media-heading">
-                                      <%=records[i].alumniName%> 
-                                  <small>Software Engineer at Facebook, Inc.</small>
-                                  <!-- <form class="deleteform" action="/admin/deleteuser/<%=records[i]._id%>?_method=DELETE" method="post">
-                                      <i class="fa fa-trash deleteuser" style="float:right;"></i>
-                                  </form> -->
-                              </h4>
-                                  <div class="media-content">
-                                      <i class="fa fa-map-marker"></i> San Francisco, California, United States
-                                      
-                                      
-                                      <ul class="list-unstyled">
-                                          <li><i class="fa fa-skype"></i> <%=records[i].alumniRollNo%></li>
-                                          <li><i class="fa fa-mobile"></i> 8790456720</li>
-                                          <li><i class="fa fa-envelope-o"></i> <%=records[i].alumniEmail%></li>
-                                          
-                                      </ul>
-                                  </div>
-                              </div>
-                          </div>
-                      </a>   
-                      <%}%> 
-                  </div>
+                </a> 
+              <% } %> 
+            </div>
+          </div><!-- End blog entries list -->
+
+          <div class="col-lg-4">
+
+            <div class="sidebar">
+
+              <h3 class="sidebar-title">Search</h3>
+              <div class="sidebar-item search-form">
+                <form action="">
+                  <input type="text" id="search">
+                  <button type="submit"><i class="bi bi-search"></i></button>
+                </form>
               </div>
-          </div> 
+              <!-- End sidebar search formn-->
+
+              <div class="sidebar-item categories">
+                <ul>
+                 
+                  <% if(logInStatus){ %>
+                    <li><a class = "btn btn-success" style="width:140px;background-color:#94c045;"href="/postjob/<%= user_id %>">Post Job +</a></li>  
+
+                  <% } else{ %>  
+                    
+                    <li><a class="btn btn-primary" style="width:180px !important;background-color:#91d8f3 !important" href="/alumni/login">Log in to Post Job</a></li>  
+                  <% } %>
+
+                </ul>
+              </div><!-- End sidebar categories-->
+
+              <h3 class="sidebar-title">Recent Posts</h3>
+              <div class="sidebar-item recent-posts">
+                <% for (var i =0; i < 5;  i++ ) { %>
+                  <div class="post-item clearfix">
+                    <img src="<%= jobs[i].companylogo.url %>" alt="">
+                    <h4><a href="<%= jobs[i].link %>"><%= jobs[i].title %></a></h4>
+                    <time datetime="2020-01-01"><%= jobs[i].createdAt.toLocaleDateString() %></time>
+                  </div>
+                <% } %>
+              </div><!-- End sidebar recent posts-->
+
+
+             
+            </div><!-- End sidebar -->
+
+          </div><!-- End blog sidebar -->
+
+        </div>
+
       </div>
-    </div>
-
-
-
-
+    </section><!-- End Blog Section -->
 
 
   </main><!-- End #main -->
+
+
+
+
 
   <!-- ======= Footer ======= -->
   <footer id="footer">
@@ -245,7 +292,7 @@
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
     $(document).ready(function(){
-      $("#myInput").on("keyup", function() {
+      $("#search").on("keyup", function() {
         var value = $(this).val().toLowerCase();
         $("#myTable a").filter(function() {
           $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)

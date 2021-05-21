@@ -13,9 +13,12 @@
     <div class="text-muted mb-2">
       <%= article.createdAt.toLocaleDateString() %>
     </div>
+    
     <a href="/" class="btn btn-secondary">All Articles</a>
     <a href="/alumni/editblog/<%= article.id %>" class="btn btn-info">Edit</a>
-
+    <form action="/alumni/deleteblog/<%= article.id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
     <div>
       <%= article.markdown %>
     </div>

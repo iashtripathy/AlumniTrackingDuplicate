@@ -12,6 +12,7 @@ var multer = require('multer');
 var nodemailer = require('nodemailer');
 
 const Blog = require('../models/blogModel')
+const Job = require('../models/jobModel');
 //const articleRouter = require('./routes/articles')
 
 
@@ -172,9 +173,6 @@ router.post('/login',async function(req,res){
         res.cookie('userId' , alumni._id);
         //res.json({success: true,status:'You are authenticated!',token:token});
 
-
-        
-        
         res.redirect('/');
        
       }
@@ -240,6 +238,8 @@ router.get('/logout', (req, res) => {
 
 
 /*-----------------------------------------------------Blog code-----------------------------------------------------------*/
+
+
 router.get('/createBlog/:id', async (req, res) => {
   //const blogs = await Blog.find().sort({ createdAt: 'desc' })
   res.render('../views/mainpage/blog/new', {_id:req.params.id , article: new Blog() })
@@ -268,9 +268,9 @@ router.post('/createdPost/:id',[presentVerifying,authenticate.verifyUser],upload
   });
   
   res.statusCode = 200;
-  console.log(req);
+  //console.log(req);
   console.log("--------------------");
-  console.log(res);
+  //console.log(res);
   res.setHeader('Content-Type', 'application/json');
   res.json({success: true, status: 'Blog Created!'});
 
@@ -290,43 +290,125 @@ router.get('/fullblog/:slug', async (req, res) => {
 })
 
 
-router.get('/editblog/:id', async (req, res) => {
+router.get('/editblog/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
   console.log("Inside edit blog")
   const blog = await Blog.findById(req.params.id)
-  console.log(blog)
-  res.render('../views/mainpage/blog/edit', { article: blog })
+  if(req.cookies.userId===blog.userId){
+    res.render('../views/mainpage/blog/edit', { article: blog })
+  }
+  else{
+    //console.log();
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this blog.Hence you cannot edit it!!"});
+  }
+  //console.log(blog)
+  //next();
+  
 })
 
 
 router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.single('blogImage'), async function(req,res,next){
-  let image;
+  
   const blog = await Blog.findById(req.params.id);
-  oldImageFileName = blog.blogImage.filename;
-  //console.log(req.file,req.params.id);
-  if(typeof req.file!=="undefined"){
-    image = { url:req.file.path , filename:req.file.filename}
-    await cloudinary.uploader.destroy(oldImageFileName);
+  if(req.cookies.userId===blog.userId){
+    let image;
+    oldImageFileName = blog.blogImage.filename;
+    //console.log(req.file,req.params.id);
+    if(typeof req.file!=="undefined"){
+      image = { url:req.file.path , filename:req.file.filename}
+      await cloudinary.uploader.destroy(oldImageFileName);
+    }
+    else{
+      //const alumni = await AlumniBasicDetails.findById(req.params.id);
+      image = { url: blog.blogImage.url , filename:blog.blogImage.filename }
+    }
+
+    const { id } = req.params;
+    let desc = req.body.description;
+    _markdown = desc.substr(0,65) + " ...";
+    const update = await Blog.findByIdAndUpdate(id, {
+        description : _markdown , 
+        markdown : req.body.description,
+        blogImage : image
+    }, { new: true })
+    .then((blogs) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        //res.redirect('/alumni/currentAlumniDetails');
+        res.json(blogs);
+    }, (err) => next(err))
+    .catch((err) => next(err))
   }
   else{
-    //const alumni = await AlumniBasicDetails.findById(req.params.id);
-    image = { url: blog.blogImage.url , filename:blog.blogImage.filename }
+    //console.log();
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this blog.Hence you cannot edit it!!"});
+  }
+})
+
+router.delete('/deleteblog/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  //const id = req.params.id;
+  //console.log(id);
+
+  const blog = await Blog.findById(req.params.id);
+  console.log(req.cookies.userId,blog.userId,req.cookies.adminId);
+  //console.log( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) )
+  //console.log( typeof(req.cookies.adminId) === "undefined" );
+  if( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) || (typeof(req.cookies.adminId)!=="undefined") ){
+
+  
+    imageFilename = blog.blogImage.filename;
+    await cloudinary.uploader.destroy(imageFilename);
+    await Blog.findOneAndRemove({_id: req.params.id },
+      function (err, docs) {
+        if (err){
+          console.log(err)
+        }
+        else{
+          console.log("Removed Blog");
+        }
+    });
+
+
+    res.redirect('/alumni/showblogs');
+  }
+  else{
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this blog.Hence you cannot delete it!!"});   
+  }
+});
+
+
+
+
+
+
+
+
+/*----------------------------------------------- Career Opportunities Code ------------------------------------*/
+
+
+
+
+router.get('/editjob/:job_id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  const job = await Job.findById(req.params.job_id)
+  
+  if( req.cookies.userId === job.uploadedByUserId ){
+    
+    console.log("------------------",req.params.job_id);
+    //res.render('../views/mainpage/job/edit')
+    res.render('../views/mainpage/job/edit',{ job : job});
+  }
+  else{
+    //console.log();
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this post.Hence you cannot edit it!!"});
   }
   
-  const { id } = req.params;
-  let desc = req.body.description;
-  _markdown = desc.substr(0,65) + " ...";
-  const update = await Blog.findByIdAndUpdate(id, {
-      description : _markdown , 
-      markdown : req.body.description,
-      blogImage : image
-  }, { new: true })
-  .then((blogs) => {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      //res.redirect('/alumni/currentAlumniDetails');
-      res.json(blogs);
-  }, (err) => next(err))
-  .catch((err) => next(err))
 })
 
 module.exports = router;

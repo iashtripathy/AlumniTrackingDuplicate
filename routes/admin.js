@@ -178,7 +178,7 @@ router.post('/login',async function(req,res){
         //res.setHeader('Content-Type', 'application/json');
         //localStorage.setItem('admintoken', token);
         res.cookie('admintoken', token);
-       
+        res.cookie('userId', admin._id);
         res.send({success: true,status:'You are authenticated!',token:token});
         //res.send(alumni);
       }
@@ -241,6 +241,7 @@ router.get('/logout', (req, res) => {
     //localStorage.removeItem('admintoken');
     res.setHeader('Content-Type','application/json');
     res.cookie('admintoken','');
+    res.cookie('userId','');
     res.json({success: true,status:"Logged Out Successfully"});
 });
 
