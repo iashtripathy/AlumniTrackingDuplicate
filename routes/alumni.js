@@ -348,67 +348,9 @@ router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.sin
   }
 })
 
-router.delete('/deleteblog/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
-  //const id = req.params.id;
-  //console.log(id);
-
-  const blog = await Blog.findById(req.params.id);
-  console.log(req.cookies.userId,blog.userId,req.cookies.adminId);
-  //console.log( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) )
-  //console.log( typeof(req.cookies.adminId) === "undefined" );
-  if( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) || (typeof(req.cookies.adminId)!=="undefined") ){
-
-  
-    imageFilename = blog.blogImage.filename;
-    await cloudinary.uploader.destroy(imageFilename);
-    await Blog.findOneAndRemove({_id: req.params.id },
-      function (err, docs) {
-        if (err){
-          console.log(err)
-        }
-        else{
-          console.log("Removed Blog");
-        }
-    });
-
-
-    res.redirect('/alumni/showblogs');
-  }
-  else{
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.json({display: "You are not the owner of this blog.Hence you cannot delete it!!"});   
-  }
-});
 
 
 
 
-
-
-
-
-/*----------------------------------------------- Career Opportunities Code ------------------------------------*/
-
-
-
-
-router.get('/editjob/:job_id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
-  const job = await Job.findById(req.params.job_id)
-  
-  if( req.cookies.userId === job.uploadedByUserId ){
-    
-    console.log("------------------",req.params.job_id);
-    //res.render('../views/mainpage/job/edit')
-    res.render('../views/mainpage/job/edit',{ job : job});
-  }
-  else{
-    //console.log();
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.json({display: "You are not the owner of this post.Hence you cannot edit it!!"});
-  }
-  
-})
 
 module.exports = router;

@@ -170,9 +170,6 @@ router.get('/services',async function(req,res){
 });
 
 
-router.get('/postjob/:user_id',async function(req,res,next){
-  res.render('../views/mainpage/job/new.ejs',{ user_id : req.params.user_id , job : new Job()});
-});
 
 
 
@@ -187,54 +184,230 @@ function presentVerifying(req,res,next){
   next();
 }
 
+
+/*------------------------------------------------------Deleting Blog--------------------------------------------------*/
+
+router.delete('/deleteblog/:id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  //const id = req.params.id;
+  //console.log(id);
+
+  const blog = await Blog.findById(req.params.id);
+  //console.log(req.cookies.userId,blog.userId,req.cookies.adminId);
+  //console.log( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) )
+  //console.log( typeof(req.cookies.adminId) === "undefined" );
+  if( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) || (typeof(req.cookies.admintoken)!=="undefined") ){
+
+  
+    imageFilename = blog.blogImage.filename;
+    await cloudinary.uploader.destroy(imageFilename);
+    await Blog.findOneAndRemove({_id: req.params.id },
+      function (err, docs) {
+        if (err){
+          console.log(err)
+        }
+        else{
+          console.log("Removed Blog");
+        }
+    });
+
+
+    res.redirect('/stories');
+  }
+  else{
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this blog.Hence you cannot delete it!!"});   
+  }
+});
+
+
+
+/*------------------------------------------------CRUD Career Opportunities-------------------------------------------------------------------- */
+
+
+
+router.get('/postjob/:user_id',async function(req,res,next){
+  res.render('../views/mainpage/job/new.ejs',{ user_id : req.params.user_id , job : new Job()});
+});
+
+
+
+
 //
-router.post('/postedJob/:user_id',[presentVerifying,authenticate.verifyUser],upload.single('companyImage') , async (req, res, next) => {
+router.post('/postedJob/:user_id',[presentVerifying,authenticate.verifyUser],upload.single('companyImage') ,(req, res, next) => {
 
-  //console.log("Insider created Post")
-  //const alumni = await AlumniBasicDetails.findById(req.params.user_id);
-  //console.log("Below alumni")
-  //const { id } = req.params;
-  //console.log(req.file);
-  
-  const image = { url: req.file.path , filename: req.file.filename };
-
-  var arr = req.body.tags;
-
-  arr = arr.replace(/\s/g,'');
-
-  skills = arr.split(",");
-
-  
-  newJob = new Job({
-    title: req.body.title, 
-    link: req.body.link, 
-    experience: req.body.experience, 
-    location:req.body.location, 
-    tags : skills , 
-    uploadedByUserId : req.params.user_id,
-    companylogo : image
-  });
-
-  await newJob.save((err)=>{
-    if(err){
+  Job.findOne({link : req.body.link},async function(err,job){
+    if(err) {
+      console.log("inside");
       console.log(err);
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
       res.json({err: err});
+    }   
+    else if(job){
+      res.statusCode = 400;
+      res.setHeader('Content-Type','application/json');
+      res.json({success: false,status:'This job already exist'});
     }
-  });
-  
-  res.statusCode = 200;
-  //console.log(req);
-  console.log("--------------------");
-  //console.log(res);
-  res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, status: 'Job Created!'});
+    else{
+      const image = { url: req.file.path , filename: req.file.filename };
+
+
+      var postedBy;
+      const alumni = await AlumniBasicDetails.findById(req.params.user_id);
+      
+      if(alumni===null){
+        postedBy = 'admin'
+      }
+      else{
+        postedBy = alumni.alumniName
+      }
+      newJob = new Job({
+        title: req.body.title, 
+        link: req.body.link, 
+        experience: req.body.experience, 
+        location:req.body.location, 
+        uploadedByName: postedBy,
+        companyName: req.body.companyname,
+    
+        uploadedByUserId : req.params.user_id,
+        companylogo : image
+      });
+    
+      await newJob.save((err)=>{
+        if(err){
+          console.log(err);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({err: err});
+        }
+      });
+      
+      res.statusCode = 200;
+      res.redirect('/services')
+    }
+  })
 
 });
 
 
 
+
+router.get('/editjob/:job_id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  const job = await Job.findById(req.params.job_id)
+  
+  if( req.cookies.userId === job.uploadedByUserId ){
+    
+    //console.log("------------------",req.params.job_id);
+    //res.render('../views/mainpage/job/edit')
+    res.render('../views/mainpage/job/edit',{ job : job});
+  }
+  else{
+    //console.log();
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this post.Hence you cannot edit it!!"});
+  }
+  
+})
+
+
+
+ router.put('/editedjob/:job_id',[presentVerifying,authenticate.verifyUser],upload.single('companyImage'), async function(req,res,next){
+  //console.log("Inside Edited job post",job_id)
+  //console.log(typeof(job_id));
+  const job = await Job.findById(req.params.job_id);
+  const alumni = await AlumniBasicDetails.findById(job.uploadedByUserId);
+  if(req.cookies.userId===job.uploadedByUserId){
+    let image;
+    oldImageFileName = job.companylogo.filename;
+    //console.log(req.file,req.params.job_id);
+    if(typeof req.file!=="undefined"){
+      image = { url:req.file.path , filename:req.file.filename}
+      await cloudinary.uploader.destroy(oldImageFileName);
+    }
+    else{
+      //const alumni = await AlumniBasicDetails.findById(req.params.id);
+      image = { url: job.companylogo.url , filename:job.companylogo.filename }
+      //console.log(image)
+    }
+
+    const id  = req.params.job_id;
+    var postedBy;
+    if(alumni===null){
+      postedBy = 'admin'
+    }
+    else{
+      postedBy = alumni.alumniName
+    }
+
+    const update = await Job.findByIdAndUpdate(id, {
+      title: req.body.title, 
+      link: req.body.link, 
+      experience: req.body.experience, 
+      location:req.body.location, 
+      uploadedByName: postedBy,
+      companyName: req.body.companyname,
+      uploadedByUserId : job.uploadedByUserId,
+      companylogo : image
+    }, { new: true })
+    .then((jobPost) => {
+        res.statusCode = 200;
+        //res.setHeader('Content-Type', 'application/json');
+        //res.redirect('/alumni/currentAlumniDetails');
+        //res.json(jobPost);
+        res.redirect('/services');
+    }, (err) => next(err))
+    .catch((err) => next(err))
+  }
+  else{
+    //console.log();
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not the owner of this post.Hence you cannot edit it!!"});
+  }
+})
+
+
+
+
+
+
+
+
+router.delete('/deletejob/:job_id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  //const id = req.params.id;
+  //console.log(id);
+
+  const job = await Job.findById(req.params.job_id);
+  //console.log(req.cookies.userId,blog.userId,req.cookies.adminId);
+  //console.log( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) )
+  //console.log( typeof(req.cookies.adminId) === "undefined" );
+  //console.log(req.cookies.adminId)
+  if( (req.cookies.userId!=="undefined" && req.cookies.userId === job.uploadedByUserId) || (typeof(req.cookies.admintoken)!=="undefined") ){
+
+  
+    imageFilename = job.companylogo.filename;
+    await cloudinary.uploader.destroy(imageFilename);
+    await Job.findOneAndRemove({_id: req.params.job_id },
+      function (err, docs) {
+        if (err){
+          console.log(err)
+        }
+        else{
+          console.log("Removed Posted Job");
+        }
+    });
+
+
+    res.redirect('/services');
+  }
+  else{
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({display: "You are not authenticated to delete it!!"});   
+  }
+});
 
 
 

@@ -19,10 +19,13 @@ const jobSchema = Schema({
         required: true
     },
 
-    /*uploadedByname,companyname should be added*/
-    tags: { 
-        type: Array, 
-        default: [] 
+    uploadedByName : {
+        type: String,
+        required : true
+    },
+    companyName : {
+        type : String,
+        required : true 
     },
     uploadedByUserId: { 
         type: String, 

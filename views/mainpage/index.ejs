@@ -120,7 +120,13 @@
     }
   </style>
 
-
+  <style>
+    .image{
+      width:180px !important;
+      height:60px !important;
+      max-height:inherit !important;
+    }
+  </style>
 
 </head>
 
@@ -131,7 +137,7 @@
     <div class="container d-flex align-items-center justify-content-between">
 
       <div class="logo">
-        <h1 class="text-light"><a href="/index">Serenity</a></h1>
+        <a class ="image" href="/index"><img class ="image" src="../../public/uploads/logo.jpeg"></a>
         <!-- Uncomment below if you prefer to use an image logo -->
         <!-- <a href="/index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
       </div>
@@ -291,7 +297,14 @@
             </div>        
             
             <div class="card">
-              <% for (var i =0; i < 4;  i++ ) { %>
+              <% var limit; %>
+              <% if(articles.length< 4){ %>
+                <% limit =  articles.length %>
+              <% } else{ %> 
+                <% limit = 4 %>
+              <% } %>
+
+              <% for (var i =0; i < limit;  i++ ) { %>
                 <a href="/storySingle/<%=articles[i]._id%>" style="color:black !important;">
                   <div class="card mb-3 eachcard" style="margin-bottom:0px !important; padding:10px;">
                     <div class="row no-gutters" style="height:100%;">
@@ -323,20 +336,29 @@
             </div>
             <div class="card">
               
-              <% for(var i = 0; i< 4; i++ ) {%>
-                <div class="card mb-3 eachcard" style="margin-bottom:0px !important; padding:10px;">
-                  <div class="row no-gutters" style="height:100%;">
-                    <div class="col-md-4" style="width:131px;height:89px;">
-                      <img src="<%= jobs[i].companylogo.url %>" style="width:131px;height:89px;" class="card-img" alt="...">
-                    </div>
-                    <div class="col-md-8" style="height:89px;">
-                      <div class="card-body" style="height:89px;padding:0px;padding-left:10px;">
-                        <h5 class="card-title title" style="height:20px;font-size:0.8rem;font-weight:bold;"><%= jobs[i].title %></h5>
-                        <p class="card-text"><small>Location : <%= jobs[i].location %></small></br><small>Experience : <%= jobs[i].experience %></small> </p>
+              <% var limit; %>
+              <% if(jobs.length< 4){ %>
+                <% limit =  jobs.length %>
+              <% } else{ %> 
+                <% limit = 4 %>
+              <% } %>
+
+              <% for(var i = 0; i< limit; i++ ) {%>
+                <a href="<%= jobs[i].link %>" style="color:black !important;">
+                  <div class="card mb-3 eachcard" style="margin-bottom:0px !important; padding:10px;">
+                    <div class="row no-gutters" style="height:100%;">
+                      <div class="col-md-4" style="width:131px;height:89px;">
+                        <img src="<%= jobs[i].companylogo.url %>" style="width:95px;height:89px;border-radius:50%;" class="card-img" alt="...">
+                      </div>
+                      <div class="col-md-8" style="height:89px;">
+                        <div class="card-body" style="height:89px;padding:0px;padding-left:10px;">
+                          <h5 class="card-title title" style="height:20px;font-size:0.8rem;font-weight:bold;"><%= jobs[i].title %></h5>
+                          <p class="card-text"><small>Location : <%= jobs[i].location %></small></br><small>Min Experience : <%= jobs[i].experience %></small> </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </a>
               <%}%>
             </div>
             <a href="/services"><button type="button" style="width:100%;background-color:#e9e9e9;padding:10px 0px !important;margin-top:10px !important;" class="btn btn-light">View All Career Opportunities</button></a>

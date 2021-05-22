@@ -11,7 +11,7 @@
   <div class="container">
     <h1 class="mb-4">Edit Job</h1>
 
-    <form action="/editpost/<%= job._id %>?_method=POST" method="post" enctype="multipart/form-data">
+    <form action="/editedjob/<%= job._id %>?_method=PUT" method="post" enctype="multipart/form-data">
       <div class="form-group">
         <label for="title">Title</label>
         <input required value="<%= job.title %>" type="text" name="title" id="title" class="form-control">
@@ -29,8 +29,8 @@
         <input required value="<%= job.location %>" type="text" name="location" id="location" class="form-control">
       </div>
       <div class="form-group">
-        <label for="title">Skills </label>
-        <textarea name="tags" id="tags" class="form-control"> <% for(var i = 0; i< job.tags.length; i++ ) {%> <%= job.tags[i] %>,<%}%></textarea>
+        <label for="title">Company Name</label>
+        <input required value="<%= job.companyName %>" type="text" name="companyname" id="companyname" class="form-control">
       </div>
       <div class="form-group">
         <label for="markdown">Company Image</label>

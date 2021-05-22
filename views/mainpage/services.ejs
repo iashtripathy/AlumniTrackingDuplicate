@@ -41,18 +41,25 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>  
 
-<style>
-  @media screen and (max-width: 991px){
-    .col-lg-4{
-      margin-top:40px !important;
+  <style>
+    @media screen and (max-width: 991px){
+      .col-lg-4{
+        margin-top:40px !important;
+      }
     }
-  }
-  #nochange a{
-    text-decoration: inherit;
-    color: inherit;
-    cursor: auto;
-  }
-</style>
+    #nochange a{
+      text-decoration: inherit;
+      color: inherit;
+      cursor: auto;
+    }
+  </style>
+  <style>
+    .image{
+      width:180px !important;
+      height:60px !important;
+      max-height:inherit !important;
+    }
+  </style>
 </head>
 
 <body style="display:block;">
@@ -62,7 +69,7 @@
     <div class="container d-flex align-items-center justify-content-between">
 
       <div class="logo">
-        <h1 class="text-light"><a href="/index">Serenity</a></h1>
+        <a class ="image" href="/index"><img class ="image" src="../../public/uploads/logo.jpeg"></a>
         <!-- Uncomment below if you prefer to use an image logo -->
         <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
       </div>
@@ -103,7 +110,6 @@
         <div class="container">
           <div class="breadcrumb-hero">
             <h2>Career Opportunities</h2>
-            <p>Est dolorum ut non facere possimus quibusdam eligendi voluptatem. Quia id aut similique quia voluptas sit quaerat debitis. Rerum omnis ipsam aperiam consequatur laboriosam nemo harum praesentium. </p>
           </div>
         </div>
       </div>
@@ -128,7 +134,7 @@
                 <a href="<%= jobs[i].link %>" class="list-group-item">
                   <div class="media">
                     <div class="pull-left">
-                      <img id="makeround" class="img-circle" style="width:84px;height:80px;"src="<%= jobs[i].companylogo.url %>" alt="...">
+                      <img id="makeround" class="img-circle" style="width:84px;height:80px;" src="<%= jobs[i].companylogo.url %>" alt="...">
                     </div>
                     <div class="media-body">
                       <h4 class="media-heading">
@@ -136,14 +142,14 @@
                       </h4>
                       <div style="margin-left:100px !important; " class="media-content">
                         <i class="fa fa-map-marker"></i> <%= jobs[i].location %>
-                        <% if(user_type['admin']){ %>
-                        
+                        <% if(user_type['admin'] && user_id !== jobs[i].uploadedByUserId ){ %>
                           <form action="/deletejob/<%= jobs[i]._id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
                             <button style="background:none;border:none;padding-left:10px" type="submit"><i class="fa fa-trash" style="color:red;" aria-hidden="true">&nbspDelete</i></button>
                           </form>  
                           </br>
-                        <% } else if( user_type['alumni'] && user_id === jobs[i].uploadedByUserId ){ %>  
-                          <form action="/alumni/editjob/<%= jobs[i]._id %>?_method=GET" method="GET" class="d-inline">
+
+                        <% } else if( (user_type['admin'] || user_type['alumni']) && user_id === jobs[i].uploadedByUserId ){ %>  
+                          <form action="/editjob/<%= jobs[i]._id %>?_method=GET" method="GET" class="d-inline">
                             <button style="background:none;border:none;padding-left:10px" type="submit"><i class="fa fa-edit" aria-hidden="true">&nbspEdit</i></button>
                           </form>
                           <form action="/deletejob/<%= jobs[i]._id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
@@ -152,7 +158,9 @@
                         <% } %> 
 
 
-                        </br>Min&nbspExperience&nbsp:&nbsp <%= jobs[i].experience %>&nbspYears
+                        </br><%= jobs[i].companyName %>
+                        &nbsp&nbspMin&nbspExp&nbsp:&nbsp <%= jobs[i].experience %>&nbspYears
+                        
 
 
                         
@@ -194,11 +202,19 @@
 
               <h3 class="sidebar-title">Recent Posts</h3>
               <div class="sidebar-item recent-posts">
-                <% for (var i =0; i < 5;  i++ ) { %>
+                
+                <% var limit; %>
+                <% if(jobs.length<5){ %>
+                  <% limit =  jobs.length %>
+                <% } else{ %> 
+                  <% limit = 5 %>
+                <% } %>
+                
+                <% for (var i =0; i < limit;  i++ ) { %>
                   <div class="post-item clearfix">
-                    <img src="<%= jobs[i].companylogo.url %>" alt="">
+                    <img style="width:75px;height:70px;border-radius:50%;" src="<%= jobs[i].companylogo.url %>" alt="">
                     <h4><a href="<%= jobs[i].link %>"><%= jobs[i].title %></a></h4>
-                    <time datetime="2020-01-01"><%= jobs[i].createdAt.toLocaleDateString() %></time>
+                    <time datetime="2020-01-01"><%= jobs[i].createdAt.toDateString() %></time>
                   </div>
                 <% } %>
               </div><!-- End sidebar recent posts-->
