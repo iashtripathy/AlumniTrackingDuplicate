@@ -13,6 +13,7 @@ var nodemailer = require('nodemailer');
 
 const Blog = require('../models/blogModel')
 const Job = require('../models/jobModel');
+const Event = require('../models/eventsModel');
 //const articleRouter = require('./routes/articles')
 
 
@@ -74,8 +75,20 @@ function presentVerifying(req,res,next){
 }
 router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],async function(req,res){
   const alumni = await AlumniBasicDetails.findById(req.user._id).select(['-alumniPassword','-hashPassword']);
-  
-  res.render('displayAlumniDetails',{details : alumni});
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+
+
+  if(typeof(req.cookies.userId !== "undefined")){
+    if(typeof(req.cookies.alumnitoken !== "undefined")) {
+      userType['alumni'] = true
+    }
+    else if(typeof(req.cookies.admintoken !== "undefined")){
+      userType['admin'] = true
+    }
+  }
+  res.render('displayAlumniDetails',{ user_type: userType , details : alumni});
   //res.send(alumni); 
 });
 
@@ -182,8 +195,20 @@ router.post('/login',async function(req,res){
 router.get('/editDetails/:id',[presentVerifying,authenticate.verifyUser],async function(req,res){
   const alumni = await AlumniBasicDetails.findById(req.params.id).select(['-alumniPassword','-hashPassword']);
   //console.log(req.params.id);
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
 
-  res.render('editAlumniDetails',{details : alumni});
+
+  if(typeof(req.cookies.userId !== "undefined")){
+    if(typeof(req.cookies.alumnitoken !== "undefined")) {
+      userType['alumni'] = true
+    }
+    else if(typeof(req.cookies.admintoken !== "undefined")){
+      userType['admin'] = true
+    }
+  }
+  res.render('editAlumniDetails',{user_type: userType , details : alumni});
 });
 
 
@@ -351,6 +376,36 @@ router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.sin
 
 
 
+/*-----------------------------------------Alumni attending the event--------------------------------------------------------------*/
 
+router.put('/attendEvent/:event_id',[presentVerifying,authenticate.verifyUser],async function(req,res,next){
 
+  const alumni = await AlumniBasicDetails.findById(req.cookies.userId);
+  //console.log(alumni);
+  const event = await Event.findById(req.params.event_id);
+  //res.send(alumni.alumniEmail);
+  var set = 0;
+  for(var i=0;i<event.attendies.length;i++){
+    if(event.attendies[i]===alumni.alumniEmail){
+      //alert("Already attending the event");
+      set = 1;
+      res.json("Already attending the event")
+      break;
+    }
+  }
+
+  if(set==0){
+    event.attendies = event.attendies.concat(alumni.alumniEmail);
+    await event.save().then((event) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      //res.redirect('/alumni/currentAlumniDetails');
+      //res.json(event);
+      res.redirect('/events');
+  }, (err) => next(err))
+  .catch((err) => next(err))
+  }
+  
+
+});
 module.exports = router;

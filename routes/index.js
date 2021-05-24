@@ -7,6 +7,7 @@ var router = express.Router();
 const bodyParser = require('body-parser');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
 var Admin = require('../models/adminModel');
+var Event = require('../models/eventsModel');
 var authenticate = require('../authenticate');
 const Blog = require('../models/blogModel');
 const Job = require('../models/jobModel');
@@ -44,13 +45,14 @@ router.get('/', async function(req, res, next) {
   //console.log('I am in main page',req);
   const blogs = await Blog.find().sort({ createdAt: 'desc' })
   const jobs = await Job.find().sort({ createdAt: 'desc' })
+  const events = await Event.find().sort({ createdAt: 'desc' })
   if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
     //console.log("I am here")
-    res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , logInStatus : true});
+    res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,logInStatus : true});
   }
   else{
     //console.log("I am here")
-    res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , logInStatus : false});
+    res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,logInStatus : false});
   }
   
 });
@@ -92,14 +94,28 @@ router.get('/team',function(req,res){
 
 
 
-router.get('/events',function(req,res){
-  if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
-    res.render('../views/mainpage/events.ejs',{logInStatus : true});
-  } 
-  else{
-    res.render('../views/mainpage/events.ejs',{logInStatus : false});
+router.get('/events',async function(req,res){
+  const events = await Event.find().sort({ createdAt: 'desc' })
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+
+ 
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
   }
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
+  }
+  else{
+    userType['viewer'] = true
+  }
+  res.render('../views/mainpage/events.ejs',{user_id : req.cookies.userId , events : events , user_type : userType});
 });
+
+
+
 
 
 router.get('/stories',async function(req,res){

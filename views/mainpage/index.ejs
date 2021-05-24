@@ -126,6 +126,17 @@
       height:60px !important;
       max-height:inherit !important;
     }
+    .date{
+      display:block;
+      color:black;
+      text-align: center;
+      text-transform:uppercase;
+    }
+    .currentdate{
+      font-size: 24px;
+      color:#f7ca18;
+      font-weight: bold;
+    }
   </style>
 
 </head>
@@ -352,7 +363,7 @@
                       </div>
                       <div class="col-md-8" style="height:89px;">
                         <div class="card-body" style="height:89px;padding:0px;padding-left:10px;">
-                          <h5 class="card-title title" style="height:20px;font-size:0.8rem;font-weight:bold;"><%= jobs[i].title %></h5>
+                          <h5 class="card-title title" style="height:30px;font-size:0.8rem;font-weight:bold;"><%= jobs[i].title %></h5>
                           <p class="card-text"><small>Location : <%= jobs[i].location %></small></br><small>Min Experience : <%= jobs[i].experience %></small> </p>
                         </div>
                       </div>
@@ -372,18 +383,29 @@
               <h3>Events</h3>
             </div>
             <div class="card">
-              
-              <% for(var i = 0; i< 4; i++ ) {%>
+              <% var limit; %>
+              <% if(events.length< 4){ %>
+                <% limit =  events.length %>
+              <% } else{ %> 
+                <% limit = 4 %>
+              <% } %>              
+
+
+              <% for(var i = 0; i< limit; i++ ) {%>
+
                 <div class="card mb-3 eachcard" style="margin-bottom:0px !important; padding:10px;">
                   <div class="row no-gutters" style="height:100%;">
-                    <div class="col-md-4" style="width:131px;height:89px;">
-                      <img src="https://images.unsplash.com/photo-1477862096227-3a1bb3b08330?ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=60" style="width:131px;height:89px;" class="card-img" alt="...">
+                    <div class="col-md-4" style="width:80px;height:89px;padding-right:0px !important;">
+                      <div class="date item">
+                        <span class="date day"><%= events[i].day.substr(0,3) %></span>
+                        <span class="date currentdate"><%= events[i].date %></span>
+                        <span class="date month"><%= events[i].month.substr(0,3) %></span>
+                      </div>
                     </div>
-                    <div class="col-md-8" style="height:89px;">
+                    <div class="col-md-8" style="height:89px;padding:0px !important;">
                       <div class="card-body" style="height:89px;padding:0px;padding-left:10px;">
-                        <h5 class="card-title title" style="height:20px;font-size:0.8rem;font-weight:bold;">Card title</h5>
-                        <p class="card-text"><small>This is a wider card with supporting text below as a natural lead-in ..</small> </p>
-                        <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+                        <h5 class="card-title title" style="height:30px;font-size:0.8rem;font-weight:bold;"><%= events[i].title %></h5>
+                        <p class="card-text"><small><%= events[i].description.substr(0,60) + " ..." %></small> </p>
                       </div>
                     </div>
                   </div>

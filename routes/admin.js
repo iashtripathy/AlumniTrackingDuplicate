@@ -2,6 +2,7 @@ var express = require('express');
 const bodyParser = require('body-parser');
 var AdminDetails = require('../models/adminModel');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
+var Event = require('../models/eventsModel');
 var passport = require('passport');
 var bcrypt = require('bcrypt');
 var LocalStorage = require('node-localstorage').LocalStorage;
@@ -23,6 +24,11 @@ router.use(methodOverride('_method'));
 router.get('/',function(req,res,next){
     res.render('adminLogin');
 })
+
+router.get('/details',function(req,res,next){
+  res.send('Admin Details Page');
+})
+
 function presentVerifying(req,res,next){
   req.name = 'admin';
   next();
@@ -231,18 +237,130 @@ router.delete('/deleteuser/:id',[presentVerifying,authenticate.verifyUser], asyn
   res.redirect('/');
 });
 
+
+
+
+/*----------------------------------------------Admin performs CRUD on events-----------------------------------------------------------------*/
+/*----------Each time an alumni clicks on attend event he will only update the attendies array of event model----------------------------------*/
+
+
+router.get('/createEvent',[presentVerifying,authenticate.verifyUser],function(req,res){
+  res.render('../views/mainpage/events/new.ejs');
+});
+
+router.post('/createdEvent',[presentVerifying,authenticate.verifyUser],(req, res, next) => {
+
+  Event.findOne({title : req.body.title , date : req.body.date , day : req.body.day , month : req.body.month , year : req.body.year },async function(err,event){
+    if(err) {
+      console.log("inside");
+      console.log(err);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});
+    }   
+    else if(event){
+      res.statusCode = 400;
+      res.setHeader('Content-Type','application/json');
+      res.json({success: false,status:'This Event has already been created'});
+    }
+    else{
+      newEvent = new Event({
+        title : req.body.title, 
+        description : req.body.description, 
+        time : req.body.time,
+        date : req.body.date,
+        day : req.body.day,
+        month : req.body.month,
+        year : req.body.year,
+        location:req.body.location,
+        attendies : []
+      });
+    
+      await newEvent.save((err)=>{
+        if(err){
+          console.log(err);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({err: err});
+        }
+      });
+      
+      res.statusCode = 200;
+      res.redirect('/events');
+    }
+  })
+
+});
+
+router.get('/editEvent/:event_id',[presentVerifying,authenticate.verifyUser],async function(req,res){
+  const event = await Event.findById(req.params.event_id)
+  res.render('../views/mainpage/events/edit.ejs',{event:event});
+});
+
+
+
+router.put('/editedEvent/:event_id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+
+  console.log(req.body.description);
+  const update = await Event.findByIdAndUpdate(req.params.event_id, {
+    title : req.body.title, 
+    description : req.body.description, 
+    time : req.body.time,
+    date : req.body.date,
+    day : req.body.day,
+    month : req.body.month,
+    year : req.body.year,
+    location:req.body.location
+  }, { new: true })
+  .then((eventEdited) => {
+      res.statusCode = 200;
+      res.redirect('/events');
+  }, (err) => next(err))
+  .catch((err) => next(err))
+});
+
+
+
+
+router.delete('/deleteEvent/:event_id',[presentVerifying,authenticate.verifyUser], async (req, res, next) => {
+  //const id = req.params.id;
+  //console.log(id);
+
+  const event = await Event.findById(req.params.event_id);
+
+  await Event.findOneAndRemove({_id: req.params.event_id },
+    function (err, event) {
+      if (err){
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({error: err});   
+        //console.log(err)
+      }
+      else{
+        //console.log("Removed Posted Job");
+        res.redirect('/events');
+      }
+  });
+  
+});
+
+
+
+
+
+
+
+
+
+/*----------------------------------------------------------Logging out admin----------------------------------------------------------*/
+
 router.get('/logout', (req, res) => {
   console.log(req.headers);
-/*   if(localStorage.getItem('admintoken') == "undefined"){
-    res.setHeader('Content-Type','application/json');
-    res.json({status:"Already Logged Out"});
-  }
-  else if (localStorage.getItem('admintoken')) { */
-    //localStorage.removeItem('admintoken');
-    res.setHeader('Content-Type','application/json');
-    res.cookie('admintoken','');
-    res.cookie('userId','');
-    res.json({success: true,status:"Logged Out Successfully"});
+
+  res.setHeader('Content-Type','application/json');
+  res.cookie('admintoken','');
+  res.cookie('userId','');
+  res.json({success: true,status:"Logged Out Successfully"});
 });
 
 module.exports = router;

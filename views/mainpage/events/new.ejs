@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Event</title>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">Create Event</h1>
+
+    <form action="/admin/createdEvent?_method=POST" method="post">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input required type="text" name="title" id="title" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="title">Description</label>
+        <textarea name="description" id="description" class="form-control"></textarea>
+        
+      </div>
+      <div class="form-group">
+        <label for="title">Time</label>
+        <input required type="text" name="time" id="time" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="title">Date</label>
+        <input required type="text" name="date" id="date" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="title">Day</label>
+        <input required type="text" name="day" id="day" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="title">Month</label>
+        <input required type="text" name="month" id="month" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="title">Year</label>
+        <input required type="text" name="year" id="year" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="title">Location</label>
+        <input required type="text" name="location" id="location" class="form-control">
+      </div>
+      <a href="/events" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+</body>
+</html>

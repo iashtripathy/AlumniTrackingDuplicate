@@ -9,6 +9,12 @@
   <meta content="" name="description">
   <meta content="" name="keywords">
 
+
+  <!-- For popup -->
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
   <!-- Favicons -->
   <link href="../../public/styles/assets/img/favicon.png" rel="icon">
   <link href="../../public/styles/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
@@ -33,7 +39,97 @@
       height:60px !important;
       max-height:inherit !important;
     }
+
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+     /* z-index: 1; Sit on top */
+      padding-top: 200px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%;
+      height: 80%;
+      overflow-y: auto;
+  
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .myBtn{
+    	cursor:pointer;
+        padding:20px;
+    }
+    #myModal{
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      
+    }
+    .btn-buy{
+      margin-bottom:10px !important;
+      width:90px;
+      height:40px;
+      padding:9px !important;
+    }
+    span,li{
+      font-size:1.1rem;
+      padding-bottom:5px;
+    }
+
+    @media screen and (max-width: 850px) and (min-width: 650px){ 
+      #myModal{
+        padding-top : 20%;
+      }
+    }
+
+    @media screen and (max-width: 649px) and (min-width: 450px){ 
+      #myModal{
+        padding-top : 30%;
+      }
+      .modal-content{
+        width:80% !important;
+     
+      }
+    }
+
+    @media screen and (max-width: 449px){ 
+      #myModal{
+        padding-top : 35%;
+      }
+      .modal-content{
+        width:80% !important;
+    
+      }
+    }
   </style>
+
+
+
 </head>
 
 <body>
@@ -63,11 +159,14 @@
           <li><a href="/stories">Alumni Stories</a></li>
           <li><a href="/contact">Contact</a></li>
 
-          <% if(!logInStatus){ %>
+          
+          <% if(!user_type['admin'] && !user_type['alumni']){ %>
             <li><a class="getstarted" href="/alumni/login">Login</a></li>
-          <% } else{ %>  
+          <% } else if(user_type['alumni']){ %>  
             
             <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
+          <% } else if(user_type['admin']){ %>
+            <li><a class="getstarted" href="/admin/details">Admin Proile</a></li>
           <% } %>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -76,176 +175,106 @@
     </div>
   </header><!-- End Header -->
 
+
+ 
+
+
+
+
   <main id="main">
+
+
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close" onclick="closed()">&times;</span>
+        <h2 style="text-align:center;">Description About Event</h2>
+        <p id="desc" style="word-break:break-word;">Some text in the Modal..</p>
+      </div>
+
+    </div>
 
     <!-- ======= Breadcrumbs ======= -->
     <section id="breadcrumbs" class="breadcrumbs">
       <div class="breadcrumb-hero">
         <div class="container">
           <div class="breadcrumb-hero">
-            <h2>Pricing</h2>
+            <h2>Program and Events</h2>
           </div>
         </div>
       </div>
       <div class="container">
         <ol>
           <li><a href="/index">Home</a></li>
-          <li>Pricing</li>
+          <li>Program and Events</li>
         </ol>
       </div>
-    </section><!-- End Breadcrumbs -->
+    </section><!-- End breadcrumbs -->
 
-    <!-- ======= Pricing Section ======= -->
+    <!-- ======= Events Section ======= -->
     <section id="pricing" class="pricing">
       <div class="container">
+        <% if(user_type['admin']){ %>
+          <div class="col-md-12 bg-light text-right" style="background-color:white !important;">
+            <a class = "btn btn-success" style="width:140px;background-color:#94c045;"href="/admin/createEvent">Create Event +</a>
+          </div>
 
+        <% } %>
         <div class="row">
 
-          <div class="col-lg-3 col-md-6">
-            <div class="box" data-aos="fade-up">
-              <h3>Free</h3>
-              <h4><sup>$</sup>0<span> / month</span></h4>
-              <ul>
-                <li>Aida dere</li>
-                <li>Nec feugiat nisl</li>
-                <li>Nulla at volutpat dola</li>
-                <li class="na">Pharetra massa</li>
-                <li class="na">Massa ultricies mi</li>
-              </ul>
-              <div class="btn-wrap">
-                <a href="#" class="btn-buy">Buy Now</a>
-              </div>
-            </div>
-          </div>
+          <% var limit; %>
+          <% if(events.length< 4){ %>
+            <% limit =  events.length %>
+          <% } else{ %> 
+            <% limit = 4 %>
+          <% } %>
 
-          <div class="col-lg-3 col-md-6 mt-4 mt-md-0">
-            <div class="box featured" data-aos="fade-up" data-aos-delay="100">
-              <h3>Business</h3>
-              <h4><sup>$</sup>19<span> / month</span></h4>
-              <ul>
-                <li>Aida dere</li>
-                <li>Nec feugiat nisl</li>
-                <li>Nulla at volutpat dola</li>
-                <li>Pharetra massa</li>
-                <li class="na">Massa ultricies mi</li>
-              </ul>
-              <div class="btn-wrap">
-                <a href="#" class="btn-buy">Buy Now</a>
-              </div>
-            </div>
-          </div>
 
-          <div class="col-lg-3 col-md-6 mt-4 mt-lg-0">
-            <div class="box" data-aos="fade-up" data-aos-delay="200">
-              <h3>Developer</h3>
-              <h4><sup>$</sup>29<span> / month</span></h4>
-              <ul>
-                <li>Aida dere</li>
-                <li>Nec feugiat nisl</li>
-                <li>Nulla at volutpat dola</li>
-                <li>Pharetra massa</li>
-                <li>Massa ultricies mi</li>
-              </ul>
-              <div class="btn-wrap">
-                <a href="#" class="btn-buy">Buy Now</a>
+          <% for(var i = 0; i < limit; i++ ) {%>
+          
+          <div class="myBtn col-lg-3 col-md-6" style="margin-bottom:25px;">
+              <div class="box" style="height:100%;" data-aos="fade-up">
+                <div id="box-content" style="height:84%;" onclick = "sendData(`<%= events[i].description %>`)" >
+                  <h5 style="font-weight:bold;color:rgb(133, 192, 44);"><%= events[i].title %></h5>
+                  <ul style="line-height:normal;">
+                    <% var data = events[i].description; %>
+                    <% data = data.substr(0,200) + "..." %>
+                    <span><%= events[i].month %></span>
+                    <span><%= events[i].date %></span>
+                    <span><%= events[i].year %></span>
+                    <li>Time : <%= events[i].time %></li>
+                    <li><%= data %></li>
+                    <li> Location : <%= events[i].location %></li>
+                  </ul>
               </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 mt-4 mt-lg-0">
-            <div class="box" data-aos="fade-up" data-aos-delay="300">
-              <span class="advanced">Advanced</span>
-              <h3>Ultimate</h3>
-              <h4><sup>$</sup>49<span> / month</span></h4>
-              <ul>
-                <li>Aida dere</li>
-                <li>Nec feugiat nisl</li>
-                <li>Nulla at volutpat dola</li>
-                <li>Pharetra massa</li>
-                <li>Massa ultricies mi</li>
-              </ul>
-              <div class="btn-wrap">
-                <a href="#" class="btn-buy">Buy Now</a>
+                
+                <% if(user_type['admin']){ %>
+                  <a href="/admin/editEvent/<%= events[i]._id %>" class="btn-buy" style="float:left;margin-left:35px;">Edit</a>
+                  <form action="/admin/deleteEvent/<%= events[i]._id %>?_method=DELETE" method="post">
+                    <button type="submit" style="border-style:hidden;" class="btn-buy" >Delete</button>
+                  </form>
+                  
+                <% } else if(user_type['alumni']) { %>
+                  <form action="/alumni/attendEvent/<%= events[i]._id %>?_method=PUT" method="post">
+                    <button type="submit" class="btn-buy" style="width:120px !important;height:45px !important;padding:9px !important;font-size:1.1rem !important;border-style:hidden;">Attend</button>
+                  </form>
+                <% } else { %>
+                  <a href="/alumni/login" class="btn-buy" style="width:160px !important;height:45px !important;padding:9px !important;font-size:1.1rem !important;">Login to Attend</a>
+                <% } %>
               </div>
-            </div>
+            
           </div>
-
+          <% } %> 
         </div>
 
-      </div>
-    </section><!-- End Pricing Section -->
-
-    <!-- ======= Frequently Asked Questions Section ======= -->
-    <section id="faq" class="faq section-bg">
-      <div class="container">
-
-        <div class="section-title" data-aos="fade-up">
-          <h2>Frequently Asked Questions</h2>
-          <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
-        </div>
-
-        <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up">
-          <div class="col-lg-5">
-            <i class="bx bx-help-circle"></i>
-            <h4>Non consectetur a erat nam at lectus urna duis?</h4>
-          </div>
-          <div class="col-lg-7">
-            <p>
-              Feugiat pretium nibh ipsum consequat. Tempus iaculis urna id volutpat lacus laoreet non curabitur gravida. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus non.
-            </p>
-          </div>
-        </div><!-- End F.A.Q Item-->
-
-        <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-          <div class="col-lg-5">
-            <i class="bx bx-help-circle"></i>
-            <h4>Feugiat scelerisque varius morbi enim nunc faucibus a pellentesque?</h4>
-          </div>
-          <div class="col-lg-7">
-            <p>
-              Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim.
-            </p>
-          </div>
-        </div><!-- End F.A.Q Item-->
-
-        <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-          <div class="col-lg-5">
-            <i class="bx bx-help-circle"></i>
-            <h4>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi?</h4>
-          </div>
-          <div class="col-lg-7">
-            <p>
-              Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis orci. Faucibus pulvinar elementum integer enim. Sem nulla pharetra diam sit amet nisl suscipit. Rutrum tellus pellentesque eu tincidunt. Lectus urna duis convallis convallis tellus.
-            </p>
-          </div>
-        </div><!-- End F.A.Q Item-->
-
-        <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-          <div class="col-lg-5">
-            <i class="bx bx-help-circle"></i>
-            <h4>Ac odio tempor orci dapibus. Aliquam eleifend mi in nulla?</h4>
-          </div>
-          <div class="col-lg-7">
-            <p>
-              Aperiam itaque sit optio et deleniti eos nihil quidem cumque. Voluptas dolorum accusantium sunt sit enim. Provident consequuntur quam aut reiciendis qui rerum dolorem sit odio. Repellat assumenda soluta sunt pariatur error doloribus fuga.
-            </p>
-          </div>
-        </div><!-- End F.A.Q Item-->
-
-        <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-          <div class="col-lg-5">
-            <i class="bx bx-help-circle"></i>
-            <h4>Tempus quam pellentesque nec nam aliquam sem et tortor consequat?</h4>
-          </div>
-          <div class="col-lg-7">
-            <p>
-              Molestie a iaculis at erat pellentesque adipiscing commodo. Dignissim suspendisse in est ante in. Nunc vel risus commodo viverra maecenas accumsan. Sit amet nisl suscipit adipiscing bibendum est. Purus gravida quis blandit turpis cursus in
-            </p>
-          </div>
-        </div><!-- End F.A.Q Item-->
 
       </div>
-    </section><!-- End Frequently Asked Questions Section -->
+    </section><!-- End Events Section -->
+
+
 
   </main><!-- End #main -->
 
@@ -318,6 +347,35 @@
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+  <script>
+    function sendData(text){
+      
+      var modal = document.getElementById("myModal");
+
+      var btn = document.getElementById("myBtn");
+    
+      var desc = document.getElementById("desc")
+      console.log(text)
+      desc.innerText = text;
+      modal.style.display = "block";
+    
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    }
+    function closed(){
+      var modal = document.getElementById("myModal");
+    
+      // Get the button that opens the modal
+      var btn = document.getElementById("myBtn");
+      modal.style.display = "none";
+       
+    }
+  </script>
+
   <!-- Vendor JS Files -->
   <script src="../../public/styles/assets/vendor/aos/aos.js"></script>
   <script src="../../public/styles/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -330,6 +388,7 @@
 
   <!-- Template Main JS File -->
   <script src="../../public/styles/assets/js/main.js"></script>
+
 
 </body>
 
