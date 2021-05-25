@@ -129,8 +129,8 @@ router.post('/register/basic', (req, res, next) => {
         res.setHeader('Content-Type','application/json');
         res.json({success: false,status:'Alumni already exist'});
       }
-      else{
-        const image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1620374983/Alumni/r1mlxaidfzxhayczkgsn.png' , filename: 'Alumni/r1mlxaidfzxhayczkgsn' };
+      else{                  
+        const image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png' , filename: 'Alumni/gdqldyoge92sbmdw2ein' };
         newAlumni = new AlumniBasicDetails({collegeName: req.body.collegeName, alumniName: req.body.alumniName, alumniRollNo: req.body.rollNo, alumniEmail:req.body.email, alumniImage : image ,alumniPassword:req.body.password, hashPassword:req.body.password});
         const salt = await bcrypt.genSalt(10);
         newAlumni.hashPassword = await bcrypt.hash(newAlumni.alumniPassword,salt);
@@ -219,9 +219,13 @@ router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser],uploa
   const alumni = await AlumniBasicDetails.findById(req.params.id);
   oldImageFileName = alumni.alumniImage.filename;
   console.log(req.file,req.params.id);
+  
   if(typeof req.file!=="undefined"){
+    if(alumni.alumniImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png"){
+      await cloudinary.uploader.destroy(oldImageFileName);
+    }
     image = { url:req.file.path , filename:req.file.filename}
-    await cloudinary.uploader.destroy(oldImageFileName);
+    
   }
   else{
     //const alumni = await AlumniBasicDetails.findById(req.params.id);
@@ -238,7 +242,7 @@ router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser],uploa
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
       //res.redirect('/alumni/currentAlumniDetails');
-      res.json(users);
+      res.redirect('/alumni/currentAlumniDetails');
   }, (err) => next(err))
   .catch((err) => next(err))
 
@@ -277,12 +281,30 @@ router.post('/createdPost/:id',[presentVerifying,authenticate.verifyUser],upload
   const alumni = await AlumniBasicDetails.findById(req.params.id);
   //console.log("Below alumni")
   const { id } = req.params;
-  console.log(req.file);
-  const image = { url: req.file.path , filename: req.file.filename };
+ 
+
+  let image;
+  
+  //if no image is given as input put the default image
+  if(typeof req.file==="undefined"){
+    image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1621970001/Alumni/qnvcvxtfyfenks51l2nj.jpg' , filename: 'Alumni/qnvcvxtfyfenks51l2nj' };
+  }
+  else{
+    //const alumni = await AlumniBasicDetails.findById(req.params.id);
+    image = { url: req.file.path , filename : req.file.filename }
+  }
+
 
   let desc = req.body.description;
   _markdown = desc.substr(0,65) + " ...";
-  newBlog = new Blog({userId: req.params.id, alumniName: alumni.alumniName, title: req.body.title, blogImage:image, description : _markdown , markdown : req.body.description});
+  newBlog = new Blog({
+    userId: req.params.id, 
+    alumniName: alumni.alumniName, 
+    title: req.body.title, 
+    blogImage:image, 
+    description : _markdown , 
+    markdown : req.body.description
+  });
 
   await newBlog.save((err)=>{
     if(err){
@@ -298,8 +320,8 @@ router.post('/createdPost/:id',[presentVerifying,authenticate.verifyUser],upload
   console.log("--------------------");
   //console.log(res);
   res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, status: 'Blog Created!'});
-
+  //res.json({success: true, status: 'Blog Created!'});
+  res.redirect('/stories');
 });
 
 router.get('/showblogs',async function(req,res,next){
@@ -340,15 +362,21 @@ router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.sin
   if(req.cookies.userId===blog.userId){
     let image;
     oldImageFileName = blog.blogImage.filename;
-    //console.log(req.file,req.params.id);
+
+
+
     if(typeof req.file!=="undefined"){
+      if(blog.blogImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621970001/Alumni/qnvcvxtfyfenks51l2nj.jpg"){
+        await cloudinary.uploader.destroy(oldImageFileName);
+      }
       image = { url:req.file.path , filename:req.file.filename}
-      await cloudinary.uploader.destroy(oldImageFileName);
+      
     }
     else{
-      //const alumni = await AlumniBasicDetails.findById(req.params.id);
+ 
       image = { url: blog.blogImage.url , filename:blog.blogImage.filename }
     }
+
 
     const { id } = req.params;
     let desc = req.body.description;
@@ -361,8 +389,8 @@ router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.sin
     .then((blogs) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        //res.redirect('/alumni/currentAlumniDetails');
-        res.json(blogs);
+        res.redirect('/stories');
+        //res.json(blogs);
     }, (err) => next(err))
     .catch((err) => next(err))
   }

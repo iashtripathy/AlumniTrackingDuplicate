@@ -216,13 +216,12 @@ router.delete('/deleteuser/:id',[presentVerifying,authenticate.verifyUser], asyn
   //for deleting the alumni image from the cloudinary database
   const alumni = await AlumniBasicDetails.findById(req.params.id);
   imageFilename = alumni.alumniImage.filename;
-  //await cloudinary.uploader.destroy(imageFilename);
 
+  if(alumni.alumniImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png"){
+    await cloudinary.uploader.destroy(imageFilename);
+  }
   
-  //await AlumniBasicDetails.findByIdAndDelete(id);
-  //res.send(result);
-  //res.redirect('/admin/getusers');
-  //console.log(AlumniBasicDetails);
+
   await AlumniBasicDetails.findOneAndRemove({_id: id },
     function (err, docs) {
       if (err){

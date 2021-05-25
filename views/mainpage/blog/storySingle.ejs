@@ -301,11 +301,11 @@
                 <ul>
                   <% if(user_type['alumni'] && _id===article.userId){ %>
                     <li><a href="/alumni/editblog/<%= article._id %>" style = "width:140px !important;margin-bottom:10px;background-color:#e9e9e9"class="btn btn-light">Edit</a></li>  
-                    <form action="/alumni/deleteblog/<%= article.id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
+                    <form action="/deleteblog/<%= article.id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
                       <button style="width:140px;" type="submit" class="btn btn-danger">Delete</button>
                     </form>
                   <% } else if(user_type['admin']){ %>
-                    <form action="/alumni/deleteblog/<%= article.id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
+                    <form action="/deleteblog/<%= article.id %>?_method=DELETE" method="POST" class="d-inline" enctype="multipart/form-data">
                       <button style="width:140px;" type="submit" class="btn btn-danger">Delete</button>
                     </form>                     
                   <% } %>

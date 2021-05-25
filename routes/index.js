@@ -278,7 +278,10 @@ router.delete('/deleteblog/:id',[presentVerifying,authenticate.verifyUser], asyn
 
   
     imageFilename = blog.blogImage.filename;
-    await cloudinary.uploader.destroy(imageFilename);
+    if(blog.blogImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621970001/Alumni/qnvcvxtfyfenks51l2nj.jpg"){
+      await cloudinary.uploader.destroy(imageFilename);
+    }
+
     await Blog.findOneAndRemove({_id: req.params.id },
       function (err, docs) {
         if (err){
