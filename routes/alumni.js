@@ -248,12 +248,13 @@ router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser],uploa
 
 
 router.get('/logout', (req, res) => {
-  console.log(req.headers);
+  //console.log(req.headers);
 
     res.setHeader('Content-Type','application/json');
     res.cookie('alumnitoken','');
     res.cookie('userId','');
-    res.json({success: true,status:"Logged Out Successfully"});
+    //res.json({success: true,status:"Logged Out Successfully"});
+    res,redirect('/');
 
 });
 

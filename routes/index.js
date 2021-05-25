@@ -46,14 +46,26 @@ router.get('/', async function(req, res, next) {
   const blogs = await Blog.find().sort({ createdAt: 'desc' })
   const jobs = await Job.find().sort({ createdAt: 'desc' })
   const events = await Event.find().sort({ createdAt: 'desc' })
-  if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
-    //console.log("I am here")
-    res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,logInStatus : true});
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+
+ 
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
+  }
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
   }
   else{
-    //console.log("I am here")
-    res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,logInStatus : false});
+    userType['viewer'] = true
   }
+  
+  res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,user_type : userType});
+
+    //res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,user_type : userType});
+
   
 });
 
