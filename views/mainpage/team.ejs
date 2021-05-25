@@ -26,6 +26,7 @@
 
   <!-- Template Main CSS File -->
   <link href="../../public/styles/assets/css/style.css" rel="stylesheet">
+  <link href="../../public/styles/modalStyle.css" rel="stylesheet">
 
   <style>
     .image{
@@ -62,13 +63,19 @@
           <li><a href="/services">Career Opportunities</a></li>
           <li><a href="/stories">Alumni Stories</a></li>
           <li><a href="/contact">Contact</a></li>
+          
+          <!-- Modal content --> 
+          <%- include('./modalLogin/modal') %>
 
-          <% if(!logInStatus){ %>
-            <li><a class="getstarted" href="/alumni/login">Login</a></li>
-          <% } else{ %>  
+          <% if(!user_type['admin'] && !user_type['alumni']){ %>
+            <li><button class="getstarted" onclick="callMe()">Login</button></li>
+          <% } else if(user_type['alumni']){ %>  
             
             <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
+          <% } else if(user_type['admin']){ %>
+            <li><a class="getstarted" href="/admin/details">Admin Proile</a></li>
           <% } %>
+
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -280,10 +287,7 @@
         &copy; Copyright <strong><span>Serenity</span></strong>. All Rights Reserved
       </div>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/serenity-bootstrap-corporate-template/ -->
+
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
     </div>
@@ -303,7 +307,8 @@
 
   <!-- Template Main JS File -->
   <script src="../../public/styles/assets/js/main.js"></script>
-
+  <%- include('./modalLogin/modalJavascript.ejs') %>
+  s
 </body>
 
 </html>

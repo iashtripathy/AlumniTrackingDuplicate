@@ -1,9 +1,4 @@
-/**
-* Template Name: Serenity - v4.1.0
-* Template URL: https://bootstrapmade.com/serenity-bootstrap-corporate-template/
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
+
 
 /*--------------------------------------------------------------
 # General
@@ -240,7 +235,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1200px) {
   .mobile-nav-toggle {
     display: block;
   }
@@ -396,7 +391,11 @@ h1, h2, h3, h4, h5, h6 {
     height : 55vw
   } 
 }
-
+@media screen and (min-device-width: 1101px) and (max-width: 1399px) {
+  .getstarted {
+    width:100px !important;
+  } 
+}
 #hero:before {
   content: "";
   background: rgba(60, 65, 51, 0.4);

@@ -32,6 +32,7 @@
 
   <!-- Template Main CSS File -->
   <link href="../../public/styles/assets/css/style.css" rel="stylesheet">
+  <link href="../../public/styles/modalStyle.css" rel="stylesheet">
 
   <style>
     .image{
@@ -40,6 +41,10 @@
       max-height:inherit !important;
     }
 
+    /*----------------------For the css of the popoup or the modal view see the style in ../../public/styles/assets/css/style.css------------------------*/
+
+    /*---------------------------------------Click on the card to popup the modal on the screen---------------------------------------------------------------*/
+        
     /* The Modal (background) */
     .modal {
       display: none; /* Hidden by default */
@@ -53,7 +58,6 @@
       background-color: rgb(0,0,0); /* Fallback color */
       background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
     }
-
     /* Modal Content */
     .modal-content {
       background-color: #fefefe;
@@ -63,9 +67,7 @@
       width: 60%;
       height: 80%;
       overflow-y: auto;
-  
     }
-
     /* The Close Button */
     .close {
       color: #aaaaaa;
@@ -73,7 +75,6 @@
       font-size: 28px;
       font-weight: bold;
     }
-
     .close:hover,
     .close:focus {
       color: #000;
@@ -81,7 +82,7 @@
       cursor: pointer;
     }
     .myBtn{
-    	cursor:pointer;
+      cursor:pointer;
         padding:20px;
     }
     #myModal{
@@ -96,38 +97,37 @@
       height:40px;
       padding:9px !important;
     }
-    span,li{
+    .eventheight{
       font-size:1.1rem;
       padding-bottom:5px;
     }
-
     @media screen and (max-width: 850px) and (min-width: 650px){ 
       #myModal{
         padding-top : 20%;
       }
     }
-
     @media screen and (max-width: 649px) and (min-width: 450px){ 
       #myModal{
         padding-top : 30%;
       }
       .modal-content{
         width:80% !important;
-     
+      
       }
     }
-
     @media screen and (max-width: 449px){ 
       #myModal{
         padding-top : 35%;
       }
       .modal-content{
         width:80% !important;
-    
+      
       }
     }
-  </style>
+    /*--------------------------------------------------------------End of logic for modal view------------------------------------------------------------------*/
 
+
+  </style>
 
 
 </head>
@@ -160,8 +160,11 @@
           <li><a href="/contact">Contact</a></li>
 
           
+          <!-- Modal content --> 
+          <%- include('./modalLogin/modal') %>
+
           <% if(!user_type['admin'] && !user_type['alumni']){ %>
-            <li><a class="getstarted" href="/alumni/login">Login</a></li>
+            <li><button class="getstarted" onclick="callMe()">Login</button></li>
           <% } else if(user_type['alumni']){ %>  
             
             <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
@@ -190,7 +193,7 @@
 
       <!-- Modal content -->
       <div class="modal-content">
-        <span class="close" onclick="closed()">&times;</span>
+        <span class="close" onclick="closeDescription()">&times;</span>
         <h2 style="text-align:center;">Description About Event</h2>
         <p id="desc" style="word-break:break-word;">Some text in the Modal..</p>
       </div>
@@ -242,12 +245,12 @@
                   <ul style="line-height:normal;">
                     <% var data = events[i].description; %>
                     <% data = data.substr(0,200) + "..." %>
-                    <span><%= events[i].month %></span>
-                    <span><%= events[i].date %></span>
-                    <span><%= events[i].year %></span>
-                    <li>Time : <%= events[i].time %></li>
-                    <li><%= data %></li>
-                    <li> Location : <%= events[i].location %></li>
+                    <span class="eventheight"><%= events[i].month %></span>
+                    <span class="eventheight"><%= events[i].date %></span>
+                    <span class="eventheight"><%= events[i].year %></span>
+                    <li class="eventheight">Time : <%= events[i].time %></li>
+                    <li class="eventheight"><%= data %></li>
+                    <li class="eventheight"> Location : <%= events[i].location %></li>
                   </ul>
               </div>
                 
@@ -366,7 +369,7 @@
         }
       }
     }
-    function closed(){
+    function closeDescription(){
       var modal = document.getElementById("myModal");
     
       // Get the button that opens the modal
@@ -388,7 +391,7 @@
 
   <!-- Template Main JS File -->
   <script src="../../public/styles/assets/js/main.js"></script>
-
+  <%- include('./modalLogin/modalJavascript.ejs') %>
 
 </body>
 

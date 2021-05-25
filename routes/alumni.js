@@ -254,7 +254,7 @@ router.get('/logout', (req, res) => {
     res.cookie('alumnitoken','');
     res.cookie('userId','');
     //res.json({success: true,status:"Logged Out Successfully"});
-    res,redirect('/');
+    res.redirect('/');
 
 });
 

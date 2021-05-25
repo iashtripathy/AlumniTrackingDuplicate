@@ -10,8 +10,6 @@
   <meta content="" name="keywords">
 
 
-<!--   <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -35,7 +33,7 @@
 
   <!-- Template Main CSS File -->
   <link href="../../public/styles/assets/css/style.css" rel="stylesheet">
-
+  <link href="../../public/styles/modalStyle.css" rel="stylesheet">
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -89,12 +87,18 @@
           <li><a href="/stories">Alumni Stories</a></li>
           <li><a href="/contact">Contact</a></li>
 
-          <% if(!logInStatus){ %>
-            <li><a class="getstarted" href="/alumni/login">Login</a></li>
-          <% } else{ %>  
-            
-            <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
-          <% } %>
+           <!-- Modal content --> 
+           <%- include('./modalLogin/modal') %>
+
+           <% if(!user_type['admin'] && !user_type['alumni']){ %>
+             <li><button class="getstarted" onclick="callMe()">Login</button></li>
+           <% } else if(user_type['alumni']){ %>  
+             
+             <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
+           <% } else if(user_type['admin']){ %>
+             <li><a class="getstarted" href="/admin/details">Admin Proile</a></li>
+           <% } %>
+
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -189,7 +193,7 @@
               <div class="sidebar-item categories">
                 <ul>
                  
-                  <% if(logInStatus){ %>
+                  <% if(user_type['admin'] || user_type['alumni']){ %>
                     <li><a class = "btn btn-success" style="width:140px;background-color:#94c045;"href="/postjob/<%= user_id %>">Post Job +</a></li>  
 
                   <% } else{ %>  
@@ -304,22 +308,22 @@
   <script src="../../public/styles/assets/js/main.js"></script>
 
 
-<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script>
-    $(document).ready(function(){
-      $("#search").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#myTable a").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+  <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+      $(document).ready(function(){
+        $("#search").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $("#myTable a").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
         });
       });
-    });
-    $(".deleteuser").click(function(){
-        $(".deleteform").submit();
-    });
-</script>
-
+      $(".deleteuser").click(function(){
+          $(".deleteform").submit();
+      });
+  </script>
+  <%- include('./modalLogin/modalJavascript.ejs') %>
 </body>
 
 </html>

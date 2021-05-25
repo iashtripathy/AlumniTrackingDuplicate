@@ -1,0 +1,104 @@
+
+.outerModal {
+    display: none; /* Hidden by default */
+    z-index: 10;
+    padding-top: 200px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+/* Modal Content */
+.inner-modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  height:40%;
+  display:flex !important;
+  overflow-y: auto;
+
+}
+#outer{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;    
+}
+.list-class{
+  margin:0 10px;
+}
+/* The Close Button */
+.closeModal {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+.closeModal:hover,
+.closeModal:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+#outerMyModal{
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  
+}
+button{
+  border-style:none !important;
+}
+.alad-login{
+  width: 120px;
+  color: white !important;
+  background-color: #9fc658;
+  border-radius: 50px !important;
+  justify-content: center !important;   
+  
+}
+@media screen and (max-width: 850px) and (min-width: 650px){ 
+  #outerMyModal{
+    padding-top : 20%;
+  }
+}
+@media screen and (max-width: 649px) and (min-width: 450px){ 
+  #outerMyModal{
+    padding-top : 30%;
+  }
+  .inner-modal-content{
+    width:80% !important;
+  
+  }
+}
+@media screen and (max-width: 449px){ 
+  #outerMyModal{
+    padding-top : 35%;
+  }
+  .inner-modal-content{
+    width:80% !important;
+  
+  }
+  #outer{
+    display:inline-grid !important;
+    margin:20% !important;
+    margin-left: 10% !important;
+  }
+}
+
+@media screen and (min-width: 1000px){ 
+   .inner-modal-content {
+    width:30%;
+    height:30%;
+  }
+  .alad-login{
+    padding:10px !important;
+  }
+
+}
+/*--------------------------------------------------------------End of logic for modal view------------------------------------------------------------------*/

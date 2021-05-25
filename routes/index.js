@@ -28,8 +28,6 @@ router.use(methodOverride('_method'));
 
 
 function isLoggedIn(token){
-  //console.log("I am inside Is logged In finctuon",req);
-  //var token = req.cookies.alumnitoken;
   console.log(typeof(token));
   if( typeof(token) === "undefined" || token.length == 0  ) {
     return false;
@@ -39,8 +37,8 @@ function isLoggedIn(token){
   }
 }
 
-/* GET home page. */
 
+/* GET home page. */
 router.get('/', async function(req, res, next) {
   //console.log('I am in main page',req);
   const blogs = await Blog.find().sort({ createdAt: 'desc' })
@@ -61,47 +59,85 @@ router.get('/', async function(req, res, next) {
   else{
     userType['viewer'] = true
   }
-  
+  console.log("Inside")
   res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,user_type : userType});
-
-    //res.render('../views/mainpage/index.ejs',{jobs: jobs , articles : blogs , events: events ,user_type : userType});
 
   
 });
-
-
 
 router.get('/index',function(req,res){
   res.redirect('/');
 });
 
+
+
 router.get('/images',function(req,res){
-  if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
-    res.render('../views/mainpage/images.ejs',{logInStatus : true});
+
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+
+ 
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
+  }
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
   }
   else{
-    res.render('../views/mainpage/images.ejs',{logInStatus : false});
+    userType['viewer'] = true
   }
+ 
+  
+  res.render('../views/mainpage/images.ejs',{user_type : userType});
+    
 });
 
 
 
 router.get('/contact',function(req,res){
-  if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
-    res.render('../views/mainpage/contact.ejs',{logInStatus : true});
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+
+ 
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
   }
-  else{  
-    res.render('../views/mainpage/contact.ejs',{logInStatus : false});
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
   }
+  else{
+    userType['viewer'] = true
+  }
+ 
+  
+  res.render('../views/mainpage/contact.ejs',{user_type : userType});
 });
 
+
+
 router.get('/team',function(req,res){
-  if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
-    res.render('../views/mainpage/team.ejs',{logInStatus : true});  
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+
+ 
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
   }
-  else{  
-    res.render('../views/mainpage/team.ejs',{logInStatus : false});
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
   }
+  else{
+    userType['viewer'] = true
+  }
+ 
+  
+  res.render('../views/mainpage/team.ejs',{user_type : userType});
 });
 
 
@@ -132,14 +168,29 @@ router.get('/events',async function(req,res){
 
 router.get('/stories',async function(req,res){
   const blogs = await Blog.find().sort({ createdAt: 'desc' })
-  if(isLoggedIn(req.cookies.alumnitoken) || isLoggedIn(req.cookies.admintoken)){
-    //console.log(req);
-    //const users = await AlumniBasicDetails.find({}).select(['-alumniPassword','-hashPassword']);
-    res.render('../views/mainpage/blog/stories.ejs',{articles : blogs ,_id : req.cookies.userId , logInStatus : true});
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+
+ 
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
+  }
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
   }
   else{
-    res.render('../views/mainpage/blog/stories.ejs',{articles : blogs ,logInStatus : false});
+    userType['viewer'] = true
+  } 
+
+  if(userType['alumni'] || userType['admin']){
+    res.render('../views/mainpage/blog/stories.ejs',{articles : blogs ,_id : req.cookies.userId , user_type : userType});
   }
+  else{
+    res.render('../views/mainpage/blog/stories.ejs',{articles : blogs ,user_type : userType});
+  }
+
 });
 
 router.get('/storySingle/:id',async function(req,res){
@@ -161,10 +212,10 @@ router.get('/storySingle/:id',async function(req,res){
     userType['viewer'] = true
   }
   if(userType['alumni'] || userType['admin']){
-    res.render('../views/mainpage/blog/storySingle.ejs',{user: alumni , article : blog , _id : req.cookies.userId , user_type : userType , logInStatus : true});
+    res.render('../views/mainpage/blog/storySingle.ejs',{user: alumni , article : blog , _id : req.cookies.userId , user_type : userType});
   }  
   else{
-    res.render('../views/mainpage/blog/storySingle.ejs',{user : alumni , article : blog , user_type : userType , logInStatus : false});
+    res.render('../views/mainpage/blog/storySingle.ejs',{user : alumni , article : blog , user_type : userType});
   }
 });
 
@@ -190,10 +241,10 @@ router.get('/services',async function(req,res){
     userType['viewer'] = true
   }
   if(userType['alumni'] || userType['admin']){
-    res.render('../views/mainpage/services.ejs',{jobs: jobs , records : users , user_id : req.cookies.userId ,user_type : userType , logInStatus : true});
+    res.render('../views/mainpage/services.ejs',{jobs: jobs , records : users , user_id : req.cookies.userId ,user_type : userType});
   }
   else{  
-    res.render('../views/mainpage/services.ejs',{jobs: jobs , records : users  , user_type : userType , logInStatus : false});
+    res.render('../views/mainpage/services.ejs',{jobs: jobs , records : users  , user_type : userType});
   }
 });
 

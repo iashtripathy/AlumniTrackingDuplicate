@@ -23,7 +23,8 @@
   
     <!-- Template Main CSS File -->
     <link href="../public/styles/assets/css/style.css" rel="stylesheet">
-  
+    <link href="../../public/styles/modalStyle.css" rel="stylesheet">
+
     <style>
       .image{
         width:180px !important;
@@ -56,14 +57,18 @@
               <li><a href="/services">Career Opportunities</a></li>
               <li><a href="/stories">Alumni Stories</a></li>
               <li><a href="/contact">Contact</a></li>
+          
+              <!-- Modal content --> 
+              <%- include('./mainpage/modalLogin/modal') %>
 
-              <% if( user_type['viewer'] ){ %>
-                <li><a class="getstarted" href="/alumni/login">Login</a></li>
+              <% if(!user_type['admin'] && !user_type['alumni']){ %>
+                <li><button class="getstarted" onclick="callMe()">Login</button></li>
               <% } else if(user_type['alumni']){ %>  
+
                 <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
               <% } else if(user_type['admin']){ %>
-                <li><a class="getstarted" href="/alumni/currentAlumniDetails">Admin Proile</a></li>
-              <% } %> 
+                <li><a class="getstarted" href="/admin/details">Admin Proile</a></li>
+              <% } %>
 
 
 
@@ -315,6 +320,7 @@
 
   <!-- Template Main JS File -->
   <script src="../public/styles/assets/js/main.js"></script>
+  <%- include('./mainpage/modalLogin/modalJavascript.ejs') %>
 
 </body>
 </html>
