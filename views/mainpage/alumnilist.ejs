@@ -42,7 +42,103 @@
       height:60px !important;
       max-height:inherit !important;
     }
+    /*--------The below media screen is writtem for search bar and all the alumnis-----------*/
+    @media screen and (max-width: 575px){ 
+        .col-md-9{
+            width:100vw !important;
+        }
+    }
+    /*point refers to the each alumni list*/
+    #point{
+        cursor:pointer;
+    }
+
+  /*---------------------------------------Click on the card to popup the modal on the screen---------------------------------------------------------------*/
+
+  /* The Modal (background) */
+  .modal {
+    display: none; /* Hidden by default */
+   /* z-index: 1; Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    height: 90%;
+    overflow-y: auto;
+  }
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .myBtn{
+    cursor:pointer;
+      padding:20px;
+  }
+  #myModal{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+
+  }
+  .btn-buy{
+    margin-bottom:10px !important;
+    width:90px;
+    height:40px;
+    padding:9px !important;
+  }
+  .eventheight{
+    font-size:1.1rem;
+    padding-bottom:5px;
+  }
+  @media screen and (max-width: 850px) and (min-width: 650px){ 
+    #myModal{
+      padding-top : 20%;
+    }
+  }
+  @media screen and (max-width: 649px) and (min-width: 450px){ 
+    #myModal{
+      padding-top : 30%;
+    }
+    .modal-content{
+      width:90% !important;
+      
+    }
+  }
+  @media screen and (max-width: 449px){ 
+    #myModal{
+      padding-top : 35%;
+    }
+    .modal-content{
+      width:90% !important;
+      
+    }
+  }
+  /*--------------------------------------------------------------End of logic for modal view------------------------------------------------------------------*/
+
   </style>
+
+
 </head>
 
 <body>
@@ -115,11 +211,11 @@
     <section id="contact" class="contact">
       <div class="container">
          
-          <div class="col-md-12" style="width:fit-content;margin-top:15px;">
+        <div class="col-md-12" style="width:fit-content;margin-top:15px;">
             <div class="page-people-directory">
                 <div class="row">
                    
-                    <div class="col-md-9" style="width:80vw !important;margin:20px 5px !important;">
+                    <div class="col-md-9" style="width:80vw;margin:20px 5px !important;">
 
                         <div class="row">
                             <div class="col-md-6">
@@ -140,31 +236,236 @@
                         
                         <div class="list-group contact-group" id="myTable">
                             <% for(var i = 0; i< records.length; i++ ) {%>
-                            <a href="#" class="list-group-item">
-                                <div class="media">
-                                    <div class="pull-left">
-                                        <img id="makeround" class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="media-heading"  style="margin-left:100px;">
-                                            <%=records[i].alumniName%> 
-                                            <small>Software Engineer at Facebook, Inc.</small>
-                                        </h4>
-                                        <div style="margin-left:100px !important; " class="media-content">
-                                            <i class="fa fa-map-marker"></i> San Francisco, California, United States
-                                            
-                                            
-                                            <ul class="list-unstyled">
-                                                <li><i class="fa fa-skype"></i> <%=records[i].alumniRollNo%></li>
-                                                <li><i class="fa fa-mobile"></i> 8790456720</li>
-                                                <li><i class="fa fa-envelope-o"></i> <%=records[i].alumniEmail%></li>
+
+
+
+
+
+                                <!-- **************************************Start of alumni details Modal.This pops up on the screen only when the admin clicks on the respective alumni name***************************************** -->
+                                
+                                <% if(user_type['admin'] || user_type['alumni']){ %>
+                                    <!-- The Modal -->
+                                    <div id="myModal" class="modal">
+                                      <!-- Modal content -->
+                                      <div class="modal-content">
+                                        <span class="close" onclick="closeDescription()">&times;</span>
+                                        <h2 style="text-align:center;">Full Alumni Details</h2>
+
+                                        <main id="main">
+                                            <div class="container" style="padding-top:20px;">
+                                                <div class="main-body">
+                                                    <!-- /Breadcrumb -->
                                                 
-                                            </ul>
-                                        </div>
-                                        
+                                                    <div class="row gutters-sm">
+                                                        <div class="col-md-4 mb-3">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    <div class="d-flex flex-column align-items-center text-center">
+                                                                        <img style="width:150px;height:150px;" src="<%=records[i].alumniImage.url%>" alt="Admin" class="rounded-circle" width="150">
+
+                                                                        <div class="mt-3">
+                                                                            <h4><%= records[i].alumniName %></h4>
+                                                                            <p class="text-secondary mb-1">Full Stack Developer</p>
+                                                                            <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p>
+                                                                            <% if(user_type['admin']){ %>
+                                                                                <form class="deleteform" action="/admin/deleteuser/<%=records[i]._id%>?_method=DELETE" method="post">
+                                                                                    <button class="btn btn-danger">Delete</button>
+                                                                                </form>
+                                                                            <% } %>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card mt-3">
+                                                                <ul class="list-group list-group-flush">
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                                                        <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe mr-2 icon-inline"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>Website</h6>
+                                                                        <span class="text-secondary">https://bootdey.com</span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                                                        <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github mr-2 icon-inline"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>Github</h6>
+                                                                        <span class="text-secondary">bootdey</span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                                                        <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-twitter mr-2 icon-inline text-info"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>Twitter</h6>
+                                                                        <span class="text-secondary">@bootdey</span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                                                        <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram mr-2 icon-inline text-danger"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>Instagram</h6>
+                                                                        <span class="text-secondary">bootdey</span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                                                        <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-facebook mr-2 icon-inline text-primary"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>Facebook</h6>
+                                                                        <span class="text-secondary">bootdey</span>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <div class="card mb-3">
+                                                                <div class="card-body">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-3">
+                                                                            <h6 class="mb-0">Full Name</h6>
+                                                                        </div>
+                                                                        <div class="col-sm-9 text-secondary">
+                                                                            <%=records[i].alumniName%>
+                                                                        </div>
+                                                                    </div>
+                                                                    <hr>
+                                                                    <div class="row">
+                                                                        <div class="col-sm-3">
+                                                                            <h6 class="mb-0">Email</h6>
+                                                                        </div>
+                                                                        <div class="col-sm-9 text-secondary">
+                                                                            <%=records[i].alumniEmail%>
+                                                                        </div>
+                                                                    </div>
+                                                                    <hr>
+                                                                    <div class="row">
+                                                                        <div class="col-sm-3">
+                                                                            <h6 class="mb-0">Roll No</h6>
+                                                                        </div>
+                                                                        <div class="col-sm-9 text-secondary">
+                                                                            <%=records[i].alumniRollNo%>
+                                                                        </div>
+                                                                    </div>
+                                                                    <hr>
+                                                                    <div class="row">
+                                                                        <div class="col-sm-3">
+                                                                            <h6 class="mb-0">Mobile</h6>
+                                                                        </div>
+                                                                        <div class="col-sm-9 text-secondary">
+                                                                            (320) 380-4539
+                                                                        </div>
+                                                                    </div>
+                                                                    <hr>
+                                                                    <div class="row">
+                                                                        <div class="col-sm-3">
+                                                                            <h6 class="mb-0">Address</h6>
+                                                                        </div>
+                                                                        <div class="col-sm-9 text-secondary">
+                                                                            Bay Area, San Francisco, CA
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row gutters-sm">
+                                                                <div class="col-sm-6 mb-3">
+                                                                    <div class="card h-100">
+                                                                        <div class="card-body">
+                                                                            <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">assignment</i>Project Status</h6>
+                                                                            <small>Web Design</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>Website Markup</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>One Page</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>Mobile Template</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>Backend API</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6 mb-3">
+                                                                    <div class="card h-100">
+                                                                        <div class="card-body">
+                                                                            <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">assignment</i>Project Status</h6>
+                                                                            <small>Web Design</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>Website Markup</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>One Page</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>Mobile Template</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                            <small>Backend API</small>
+                                                                            <div class="progress mb-3" style="height: 5px">
+                                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </main>
+
+
+                                      </div>
                                     </div>
-                                </div>
-                            </a>   
+                                
+                                <% } %>
+
+
+
+                                <!-- **************************************End of alumni details Modal***************************************** -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                <% var index; %>
+                                
+                                <% index =  i %>
+
+                                <a class="list-group-item" onclick="sendData('<%= index %>')" id="point">
+                                    <div class="media">
+                                        <div class="pull-left">
+                                            <img id="makeround" class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
+                                        </div>
+                                        <div class="media-body">
+                                            <h4 class="media-heading"  style="margin-left:100px;">
+                                                <%=records[i].alumniName%> 
+                                                <small>Software Engineer at Facebook, Inc.</small>
+
+                                            </h4>
+                                            <div style="margin-left:100px !important; " class="media-content">
+                                                <i class="fa fa-map-marker"></i> San Francisco, California, United States
+
+
+                                                <ul class="list-unstyled">
+                                                    <li><i class="fa fa-skype"></i> <%=records[i].alumniRollNo%></li>
+                                                    <li><i class="fa fa-mobile"></i> 8790456720</li>
+                                                    <li><i class="fa fa-envelope-o"></i> <%=records[i].alumniEmail%></li>
+
+                                                </ul>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </a>   
                             <%}%> 
                         </div>
                     </div>
@@ -176,74 +477,18 @@
 
         </div>
 
+
+
+        </div>
+
       </div>
     </section><!-- End Contact Section -->
 
   </main><!-- End #main -->
 
-  <!-- ======= Footer ======= -->
-  <footer id="footer">
-    <div class="footer-top">
-      <div class="container">
-        <div class="row">
-
-          <div class="col-lg-3 col-md-6 footer-info">
-            <h3>Serenity</h3>
-            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus. Scelerisque felis imperdiet proin fermentum leo. Amet volutpat consequat mauris nunc congue.</p>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Useful Links</h4>
-            <ul>
-              <li><a href="#">Home</a></li>
-              <li><a href="#">About us</a></li>
-              <li><a href="#">Services</a></li>
-              <li><a href="#">Terms of service</a></li>
-              <li><a href="#">Privacy policy</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <h4>Contact Us</h4>
-            <p>
-              A108 Adam Street <br>
-              New York, NY 535022<br>
-              United States <br>
-              <strong>Phone:</strong> +1 5589 55488 55<br>
-              <strong>Email:</strong> info@example.com<br>
-            </p>
-
-            <div class="social-links">
-              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-            </div>
-
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-newsletter">
-            <h4>Our Newsletter</h4>
-            <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna veniam enim veniam illum dolore legam minim quorum culpa amet magna export quem marada parida nodela caramase seza.</p>
-            <form action="" method="post">
-              <input type="email" name="email"><input type="submit" value="Subscribe">
-            </form>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-      <div class="copyright">
-        &copy; Copyright <strong><span>Serenity</span></strong>. All Rights Reserved
-      </div>
-      <div class="credits">
-
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-      </div>
-    </div>
-  </footer><!-- End Footer -->
+  <!--FOOTER SECTION-->
+  <%- include('./footer.ejs') %>
+  <!--FOOTER ENDS-->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -274,6 +519,44 @@
     $(".deleteuser").click(function(){
         $(".deleteform").submit();
     });
+  </script>
+
+
+  <script>
+    function sendData(i){
+      
+      var modal = document.getElementsByClassName("modal")
+      //var mymodal = document.getElementById("myModal");
+
+      var btn = document.getElementById("myBtn");
+    
+      //console.log(text)
+      //desc.innerText = text;
+      modal[i].style.display = "block";
+    
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        for(var j=0;j<modal.length;j++){
+            if (event.target == modal[j]) {
+            
+                modal[j].style.display = "none";
+            }
+          
+        }
+      }
+    }
+    function closeDescription(){
+      //var mymodal = document.getElementById("myModal");
+      var modal = document.getElementsByClassName("modal")
+      // Get the button that opens the modal
+      var btn = document.getElementById("myBtn");
+      for(var j=0;j<modal.length;j++){
+        modal[j].style.display = "none";
+      }
+      
+      //mymodal.style.display = "none";
+       
+    }
   </script>
 
 </body>

@@ -101,26 +101,6 @@ router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],as
 });
 
 
-
-/* GET users listing. */
-//authenticate.verifyUser,
-
-router.get('/getdetails/:password',[presentVerifying,authenticate.verifyUser],(req,res,next) => {
-  AlumniBasicDetails.find({alumniPassword:req.params.password})
-  .then((users) => {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.json(users);
-  }, (err) => {
-      console.log(err);
-    next(err);
-    })
-  .catch((err) => {
-        console.log(err);
-        next(err);
-    });
-});
-
 router.post('/register/basic', (req, res, next) => {
     console.log("Registrating");
     //console.log(req.body);
