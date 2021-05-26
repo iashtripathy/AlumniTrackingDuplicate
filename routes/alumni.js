@@ -52,6 +52,14 @@ router.get('/',function(req,res,next){
 })
 
 
+
+
+
+
+
+
+
+
 /* router.get('/forgotPassword',function(req,res,next){
   var transporter = nodemailer.createTransport({ service: 'Sendgrid', auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD } });
   var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
@@ -287,7 +295,7 @@ router.post('/createdPost/:id',[presentVerifying,authenticate.verifyUser],upload
   
   //if no image is given as input put the default image
   if(typeof req.file==="undefined"){
-    image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1621970001/Alumni/qnvcvxtfyfenks51l2nj.jpg' , filename: 'Alumni/qnvcvxtfyfenks51l2nj' };
+    image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1622037742/Alumni/nnejmzaqcerkeqt2tg5a.jpg' , filename: 'Alumni/nnejmzaqcerkeqt2tg5a' };
   }
   else{
     //const alumni = await AlumniBasicDetails.findById(req.params.id);
@@ -366,7 +374,7 @@ router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.sin
 
 
     if(typeof req.file!=="undefined"){
-      if(blog.blogImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621970001/Alumni/qnvcvxtfyfenks51l2nj.jpg"){
+      if(blog.blogImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1622037742/Alumni/nnejmzaqcerkeqt2tg5a.jpg"){
         await cloudinary.uploader.destroy(oldImageFileName);
       }
       image = { url:req.file.path , filename:req.file.filename}

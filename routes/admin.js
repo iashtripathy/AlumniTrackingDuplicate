@@ -1,3 +1,8 @@
+if(process.env.NODE_ENV !=="production"){
+  require('dotenv').config();
+}
+
+
 var express = require('express');
 const bodyParser = require('body-parser');
 var AdminDetails = require('../models/adminModel');
@@ -5,6 +10,7 @@ var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
 var Event = require('../models/eventsModel');
 var passport = require('passport');
 var bcrypt = require('bcrypt');
+var nodemailer = require('nodemailer');
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = LocalStorage('./tokens');
 /* var JwtStrategy = require('passport-jwt').Strategy;
@@ -25,19 +31,56 @@ router.get('/',function(req,res,next){
     res.render('adminLogin');
 })
 
-router.get('/details',function(req,res,next){
+/* router.get('/details',function(req,res,next){
   res.send('Admin Details Page');
-})
+}) */
+
+
+function isLoggedIn(token){
+  console.log(typeof(token));
+  if( typeof(token) === "undefined" || token.length == 0  ) {
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+
+
 
 function presentVerifying(req,res,next){
   req.name = 'admin';
   next();
 }
-/* router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],async function(req,res){
-  const alumni = await AlumniBasicDetails.findById(req.user._id).select(['-alumniPassword','-hashPassword','-alumniEmail']);
-  res.send(alumni); 
+
+
+
+
+
+router.get('/details',[presentVerifying,authenticate.verifyUser],async function(req,res){
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+  let user;
+  const alumnis = await AlumniBasicDetails.find({}).select(['-alumniPassword','-hashPassword']);
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
+    user = await AlumniBasicDetails.findById(req.cookies.userId);
+  }
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
+  }
+  else{
+    userType['viewer'] = true
+  }
+
+  res.render('../views/mainpage/admindetails.ejs',{user_type : userType , user: user ,records: alumnis});
 });
- */
+
+
+
 
 
 /* GET users listing. */
@@ -57,21 +100,6 @@ function presentVerifying(req,res,next){
         next(err);
     });
 }); */
-
-router.get('/getusers',[presentVerifying,authenticate.verifyUser],async function(req,res,next){
-  const users = await AlumniBasicDetails.find({}).select(['-alumniPassword','-hashPassword']);
-/*   res.status(200).json({
-    data: users
-  }); */
-  //console.log(users);
-  //JSON.stringify()
-  //console.log(users);
-  res.render('listAlumni',{records : users});
-  //res.send(data); 
-});
-
-
-
 
 
 
@@ -185,8 +213,8 @@ router.post('/login',async function(req,res){
         //localStorage.setItem('admintoken', token);
         res.cookie('admintoken', token);
         res.cookie('userId', admin._id);
-        res.send({success: true,status:'You are authenticated!',token:token});
-        //res.send(alumni);
+        //res.send({success: true,status:'You are authenticated!',token:token});
+        res.redirect('/');
       }
     }
 });
@@ -213,27 +241,39 @@ router.delete('/deleteuser/:id',[presentVerifying,authenticate.verifyUser], asyn
   const id = req.params.id;
   console.log(id);
 
-  //for deleting the alumni image from the cloudinary database
-  const alumni = await AlumniBasicDetails.findById(req.params.id);
-  imageFilename = alumni.alumniImage.filename;
+  const admin = await AdminDetails.findById(req.cookies.userId);
+  //console.log("---------------------------------------Type is-----------------------------------------------------------")
+  //console.log(typeof(admin));
+  if(typeof(admin)!==undefined){
 
-  if(alumni.alumniImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png"){
-    await cloudinary.uploader.destroy(imageFilename);
+    //for deleting the alumni image from the cloudinary database
+    const alumni = await AlumniBasicDetails.findById(req.params.id);
+    imageFilename = alumni.alumniImage.filename;
+
+    if(alumni.alumniImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png"){
+      await cloudinary.uploader.destroy(imageFilename);
+    }
+
+
+    await AlumniBasicDetails.findOneAndRemove({_id: id },
+      function (err, docs) {
+        if (err){
+          console.log(err)
+        }
+        else{
+          console.log("Removed User : ", docs);
+        }
+    });
+
+
+    res.redirect('/');
+
   }
-  
+  else{
+    res.setHeader('Content-Type', 'application/json');
+    res.send({success: true,status:'You are authenticated! to delete alumni'});
+  }
 
-  await AlumniBasicDetails.findOneAndRemove({_id: id },
-    function (err, docs) {
-      if (err){
-        console.log(err)
-      }
-      else{
-        console.log("Removed User : ", docs);
-      }
-});
-
-
-  res.redirect('/');
 });
 
 
@@ -348,6 +388,52 @@ router.delete('/deleteEvent/:event_id',[presentVerifying,authenticate.verifyUser
 
 
 
+/*-------------------------------------------Send emails to all the alumni frequently about events-------------------------------------*/
+
+let transport = nodemailer.createTransport({
+  //  host: 'smtp.mailtrap.io',
+    service : 'gmail',
+  //  port: 2525,
+    auth: {
+       user: process.env.EMAIL,
+       pass: process.env.EMAIL_KEY
+    }
+  });
+  
+  
+  
+  //send mail
+  router.post('/sendmail', async function(req, res) {
+    console.log('sending email..');
+    email = []
+    const alumni = await AlumniBasicDetails.find();
+    for(var i=0;i<alumni.length;i++){
+      email.push(alumni[i].alumniEmail);
+    }
+
+    const message = {
+      from: "testalumniapp@gmail.com", // Sender address
+      to: email,         // recipients
+      subject: req.body.subject, // Subject line
+      text: req.body.message // Plain text body
+    };
+    transport.sendMail(message, function(err, info) {
+        if (err) {
+          console.log(err)
+          res.send(err);
+        } else {
+          console.log('mail has sent.');
+          console.log(info);
+          res.redirect("/admin/details");
+        }
+    });
+  
+  });
+
+
+
+
+
 
 
 
@@ -359,7 +445,8 @@ router.get('/logout', (req, res) => {
   res.setHeader('Content-Type','application/json');
   res.cookie('admintoken','');
   res.cookie('userId','');
-  res.json({success: true,status:"Logged Out Successfully"});
+  //res.json({success: true,status:"Logged Out Successfully"});
+  res.redirect('/');
 });
 
 module.exports = router;

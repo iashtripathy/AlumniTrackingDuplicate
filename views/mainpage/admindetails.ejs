@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Admin Dashboard - Alumni Association</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  
+  <!-- Favicons -->
+  <link href="../../public/styles/assets/img/favicon.png" rel="icon">
+  <link href="../../public/styles/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../public/styles/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../public/styles/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../public/styles/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../public/styles/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../public/styles/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../public/styles/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../../public/styles/assets/css/style.css" rel="stylesheet">
+  <link href="../../public/styles/modalStyle.css" rel="stylesheet">
+
+
+  <!--CSS for listing all the alumni-->
+
+  <link rel="stylesheet"  type="text/css" href="../../public/styles/listAlumni.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <style>
+    .image{
+      width:180px !important;
+      height:60px !important;
+      max-height:inherit !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center">
+    <div class="container d-flex align-items-center justify-content-between">
+
+      <div class="logo">
+        <!-- <h1 class="text-light"></h1> -->
+        <a class ="image" href="/index"><img class ="image" src="../../public/uploads/logo.jpeg"></a>
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+      </div>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="/index">Home</a></li>
+          <li class="dropdown"><a href="#"><span>About</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+              <li><a href="/images">Images</a></li>
+              <li><a href="/team">Team</a></li>
+            </ul>
+          </li>
+          
+          <li><a href="/events">Programs and Events</a></li>
+          <li><a href="/services">Career Opportunities</a></li>
+          <li><a href="/stories">Alumni Stories</a></li>
+          <li><a href="/contact">Contact</a></li>
+
+          <!-- Modal content --> 
+          <%- include('./modalLogin/modal') %>
+
+          <% if(!user_type['admin'] && !user_type['alumni']){ %>
+            <li><button class="getstarted" onclick="callMe()">Login</button></li>
+          <% } else if(user_type['alumni']){ %>  
+            
+            <li><a class="getstarted" href="/alumni/currentAlumniDetails">My Proile</a></li>
+          <% } else if(user_type['admin']){ %>
+            <li><a class="getstarted" href="/admin/details">Admin Proile</a></li>
+          <% } %>
+          
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="breadcrumb-hero">
+        <div class="container">
+          <div class="breadcrumb-hero">
+            <h2>Admin Profile</h2>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <ol>
+          <li><a href="/index">Home</a></li>
+          <li>Admin Profile</li>
+        </ol>
+      </div>
+      <div class="container" style="float:right;width:100px !important;margin-right:5vw;">
+        <a href="/admin/logout"><button class="btn btn-success" style="background:#94c045;border-color:none;">Logout</button></a>
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Contact Section ======= -->
+    <section id="contact" class="contact">
+      <div class="container">
+          <% if(user_type['admin']){ %>
+            <div class="col-lg-8 mt-5 mt-lg-0" data-aos="fade-left" style="width:80vw !important;">
+              <h4>Send Notification to Alumni</h4>  
+              <form action="/admin/sendmail" method="post">
+                <div class="form-group mt-3">
+                  <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
+                </div>
+                <div class="form-group mt-3">
+                  <textarea class="form-control" name="message" rows="5" placeholder="Message" required></textarea>
+                </div>
+                <div class="my-3">
+                  <div class="error-message"></div>
+                  <div class="sent-message" id="sent-message" style="display:none;">Your message has been sent. Thank you!</div>
+                </div>
+
+                <div class="text-center"><button type="submit" class="btn btn-success" style="background:#94c045;border-color:none;">Send Message</button></div>
+              </form>
+            </div>
+          <% } %>
+
+          <div class="col-md-12" style="width:fit-content;margin-top:15px;">
+            <div class="page-people-directory">
+                <div class="row">
+                   
+                    <div class="col-md-9" style="width:80vw !important;margin:20px 5px !important;">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 style="font-family:none;">Search Alumni</h3>
+                            </div>
+                           
+                        </div>
+
+
+                        <div class="well">
+                            <div class="row">
+                                <input class="form-control" id="myInput" type="text" placeholder="Search..">
+                                
+                            </div>
+                        </div>
+                        <br>
+
+                        
+                        <div class="list-group contact-group" id="myTable">
+                            <% for(var i = 0; i< records.length; i++ ) {%>
+                            <a href="#" class="list-group-item">
+                                <div class="media">
+                                    <div class="pull-left">
+                                        <img id="makeround" class="img-circle" src="<%=records[i].alumniImage.url %>" alt="...">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"  style="margin-left:100px;">
+                                            <%=records[i].alumniName%> 
+                                            <small>Software Engineer at Facebook, Inc.</small>
+                                            <form class="deleteform" action="/admin/deleteuser/<%=records[i]._id%>?_method=DELETE" method="post">
+                                                <i class="fa fa-trash deleteuser" style="float:right;"></i>
+                                            </form>
+                                        </h4>
+                                        <div style="margin-left:100px !important; " class="media-content">
+                                            <i class="fa fa-map-marker"></i> San Francisco, California, United States
+                                            
+                                            
+                                            <ul class="list-unstyled">
+                                                <li><i class="fa fa-skype"></i> <%=records[i].alumniRollNo%></li>
+                                                <li><i class="fa fa-mobile"></i> 8790456720</li>
+                                                <li><i class="fa fa-envelope-o"></i> <%=records[i].alumniEmail%></li>
+                                                
+                                            </ul>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </a>   
+                            <%}%> 
+                        </div>
+                    </div>
+                </div> 
+            </div>
+         </div>
+
+
+
+        </div>
+
+      </div>
+    </section><!-- End Contact Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-info">
+            <h3>Serenity</h3>
+            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus. Scelerisque felis imperdiet proin fermentum leo. Amet volutpat consequat mauris nunc congue.</p>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">About us</a></li>
+              <li><a href="#">Services</a></li>
+              <li><a href="#">Terms of service</a></li>
+              <li><a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h4>Contact Us</h4>
+            <p>
+              A108 Adam Street <br>
+              New York, NY 535022<br>
+              United States <br>
+              <strong>Phone:</strong> +1 5589 55488 55<br>
+              <strong>Email:</strong> info@example.com<br>
+            </p>
+
+            <div class="social-links">
+              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            </div>
+
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-newsletter">
+            <h4>Our Newsletter</h4>
+            <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna veniam enim veniam illum dolore legam minim quorum culpa amet magna export quem marada parida nodela caramase seza.</p>
+            <form action="" method="post">
+              <input type="email" name="email"><input type="submit" value="Subscribe">
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>Serenity</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../../public/styles/assets/vendor/aos/aos.js"></script>
+  <script src="../../public/styles/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../public/styles/assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../public/styles/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../../public/styles/assets/vendor/php-email-form/validate.js"></script>
+  <script src="../../public/styles/assets/vendor/purecounter/purecounter.js"></script>
+  <script src="../../public/styles/assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="../../public/styles/assets/vendor/waypoints/noframework.waypoints.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../../public/styles/assets/js/main.js"></script>
+  <%- include('./modalLogin/modalJavascript.ejs') %>
+
+ <!--Script for find the alumni by search--> 
+  <script>
+    $(document).ready(function(){
+      $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#myTable a").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+    $(".deleteuser").click(function(){
+        $(".deleteform").submit();
+    });
+  </script>
+
+</body>
+
+</html>

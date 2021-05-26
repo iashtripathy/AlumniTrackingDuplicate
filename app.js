@@ -83,7 +83,6 @@ app.use('/', index);
 app.use('/admin',admin);
 app.use('/alumni', alumni);
 
-
 app.use(express.static('.'));
 //app.use(express.static(path.join(__dirname, 'public/styles')));
 //app.use('/college',college);

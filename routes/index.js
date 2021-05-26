@@ -5,6 +5,7 @@ if(process.env.NODE_ENV !=="production"){
 var express = require('express');
 var router = express.Router();
 const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
 var Admin = require('../models/adminModel');
 var Event = require('../models/eventsModel');
@@ -24,6 +25,10 @@ var upload = multer({storage});
 //for faking a post request as put for updating data
 var methodOverride = require('method-override');
 router.use(methodOverride('_method'));
+
+
+
+
 
 
 
@@ -70,7 +75,6 @@ router.get('/index',function(req,res){
 });
 
 
-
 router.get('/images',function(req,res){
 
   let userType = new Map()
@@ -96,15 +100,16 @@ router.get('/images',function(req,res){
 
 
 
-router.get('/contact',function(req,res){
+router.get('/contact',async function(req,res){
   let userType = new Map()
   userType['alumni'] = false;
   userType['admin'] = false;
   userType['viewer'] = false;
-
+  let user;
  
   if(isLoggedIn(req.cookies.alumnitoken)){
     userType['alumni'] = true
+    user = await AlumniBasicDetails.findById(req.cookies.userId);
   }
   else if(isLoggedIn(req.cookies.admintoken)){
     userType['admin'] = true
@@ -112,22 +117,21 @@ router.get('/contact',function(req,res){
   else{
     userType['viewer'] = true
   }
- 
-  
-  res.render('../views/mainpage/contact.ejs',{user_type : userType});
+
+  res.render('../views/mainpage/contact.ejs',{user_type : userType , user: user});
 });
 
 
 
-router.get('/team',function(req,res){
+router.get('/team',async function(req,res){
   let userType = new Map()
   userType['alumni'] = false;
   userType['admin'] = false;
   userType['viewer'] = false;
-
- 
+  
   if(isLoggedIn(req.cookies.alumnitoken)){
     userType['alumni'] = true
+  
   }
   else if(isLoggedIn(req.cookies.admintoken)){
     userType['admin'] = true
@@ -278,7 +282,7 @@ router.delete('/deleteblog/:id',[presentVerifying,authenticate.verifyUser], asyn
 
   
     imageFilename = blog.blogImage.filename;
-    if(blog.blogImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621970001/Alumni/qnvcvxtfyfenks51l2nj.jpg"){
+    if(blog.blogImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1622037742/Alumni/nnejmzaqcerkeqt2tg5a.jpg"){
       await cloudinary.uploader.destroy(imageFilename);
     }
 
@@ -318,6 +322,8 @@ router.get('/postjob/:user_id',async function(req,res,next){
 //
 router.post('/postedJob/:user_id',[presentVerifying,authenticate.verifyUser],upload.single('companyImage') ,(req, res, next) => {
 
+
+  //https://res.cloudinary.com/dzxf40jom/image/upload/v1622034062/Alumni/illhavjf6qxpzpqg64bk.jpg
   Job.findOne({link : req.body.link},async function(err,job){
     if(err) {
       console.log("inside");
@@ -332,7 +338,17 @@ router.post('/postedJob/:user_id',[presentVerifying,authenticate.verifyUser],upl
       res.json({success: false,status:'This job already exist'});
     }
     else{
-      const image = { url: req.file.path , filename: req.file.filename };
+
+      let image;
+  
+      //if no image is given as input put the default image
+      if(typeof req.file==="undefined"){
+        image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1622035002/Alumni/chgrhf7bfeib3f0yfixh.jpg' , filename: 'Alumni/chgrhf7bfeib3f0yfixh' };
+      }
+      else{
+        //const alumni = await AlumniBasicDetails.findById(req.params.id);
+        image = { url: req.file.path , filename : req.file.filename }
+      }
 
 
       var postedBy;
@@ -404,15 +420,22 @@ router.get('/editjob/:job_id',[presentVerifying,authenticate.verifyUser], async 
     let image;
     oldImageFileName = job.companylogo.filename;
     //console.log(req.file,req.params.job_id);
+
+
+
+
     if(typeof req.file!=="undefined"){
+      if(job.companylogo.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1622035002/Alumni/chgrhf7bfeib3f0yfixh.jpg"){
+        await cloudinary.uploader.destroy(oldImageFileName);
+      }
       image = { url:req.file.path , filename:req.file.filename}
-      await cloudinary.uploader.destroy(oldImageFileName);
+
     }
     else{
-      //const alumni = await AlumniBasicDetails.findById(req.params.id);
+
       image = { url: job.companylogo.url , filename:job.companylogo.filename }
-      //console.log(image)
     }
+
 
     const id  = req.params.job_id;
     var postedBy;
@@ -470,7 +493,12 @@ router.delete('/deletejob/:job_id',[presentVerifying,authenticate.verifyUser], a
 
   
     imageFilename = job.companylogo.filename;
-    await cloudinary.uploader.destroy(imageFilename);
+
+    if(job.companylogo.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1622035002/Alumni/chgrhf7bfeib3f0yfixh.jpg"){
+      await cloudinary.uploader.destroy(imageFilename);
+    }
+
+    //await cloudinary.uploader.destroy(imageFilename);
     await Job.findOneAndRemove({_id: req.params.job_id },
       function (err, docs) {
         if (err){
@@ -492,6 +520,30 @@ router.delete('/deletejob/:job_id',[presentVerifying,authenticate.verifyUser], a
 });
 
 
+
+
+router.get('/findalumni',async function(req,res,next){
+  let userType = new Map()
+  userType['alumni'] = false;
+  userType['admin'] = false;
+  userType['viewer'] = false;
+  let user;
+  const alumnis = await AlumniBasicDetails.find({}).select(['-alumniPassword','-hashPassword']);
+  if(isLoggedIn(req.cookies.alumnitoken)){
+    userType['alumni'] = true
+    user = await AlumniBasicDetails.findById(req.cookies.userId);
+  }
+  else if(isLoggedIn(req.cookies.admintoken)){
+    userType['admin'] = true
+  }
+  else{
+    userType['viewer'] = true
+  }
+
+  res.render('../views/mainpage/alumnilist.ejs',{user_type : userType , user: user ,records: alumnis});
+
+
+});
 
 
 module.exports = router;
