@@ -121,7 +121,7 @@ router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],as
 router.post('/register/basic', (req, res, next) => {
     console.log("Registrating");
     //console.log(req.body);
-    AlumniBasicDetails.findOne({collegeName:req.body.collegeName, alumniRollNo:req.body.rollNo},async function(err,alumni){
+    AlumniBasicDetails.findOne({alumniEmail:req.body.email},async function(err,alumni){
       if(err) {
         console.log("inside");
         console.log(err);
@@ -134,9 +134,36 @@ router.post('/register/basic', (req, res, next) => {
         res.setHeader('Content-Type','application/json');
         res.json({success: false,status:'Alumni already exist'});
       }
-      else{                  
+      else{             
+        let website,linkedin,facebook,instagram     
         const image = { url:'https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png' , filename: 'Alumni/gdqldyoge92sbmdw2ein' };
-        newAlumni = new AlumniBasicDetails({collegeName: req.body.collegeName, alumniName: req.body.alumniName, alumniRollNo: req.body.rollNo, alumniEmail:req.body.email, alumniImage : image ,alumniPassword:req.body.password, hashPassword:req.body.password});
+        newAlumni = new AlumniBasicDetails({ 
+          alumniName: req.body.alumniName, 
+          alumniRollNo: req.body.rollNo, 
+          alumniEmail:req.body.email, 
+          alumniImage : image ,
+          alumniDegree : req.body.degree,
+          alumniBranch : req.body.branch,
+          alumniGraduationYear : req.body.graduationYear,
+          alumniAddress : req.body.address,
+          alumniSkills : req.body.skills,
+          alumniCurrentWorkingCompany : req.body.company,
+          alumniDesignation : req.body.designation,
+          alumniWorkExperience : req.body.experience,
+          alumniCurrentLocationCity : req.body.city,
+          alumniCurrentLocationZip : req.body.zip,
+          alumniCurrentLocationState : req.body.state,
+          alumniCurrentLocationCountry : req.body.country,
+          alumniHigherEducation : req.body.higherEducation,
+          alumniWebsite : req.body.website,
+          alumniLinkedin : req.body.linkedin,
+          alumniGithub : req.body.github,
+          alumniInstagram : req.body.instagram,
+          alumniFacebook : req.body.facebook,
+          alumniTwitter : req.body.twitter,
+          alumniPassword:req.body.password, 
+          hashPassword:req.body.password
+        });
         const salt = await bcrypt.genSalt(10);
         newAlumni.hashPassword = await bcrypt.hash(newAlumni.alumniPassword,salt);
         await newAlumni.save((err)=>{
@@ -144,46 +171,47 @@ router.post('/register/basic', (req, res, next) => {
             console.log(err);
             res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
-            res.json({err: err});
+            res.send({err: err});
           }
+          else{
+            var token = authenticate.getToken({_id: newAlumni._id});
+            var saveToken = new Token({_userId:newAlumni._id , token:token });
+            
+            saveToken.save(function(err){
+              if(err){
+                res.status = 500;
+                res.send({message: err.message })
+              }
+  
+                
+                
+                //send mail
+              console.log("HEADERS HOST");
+              console.log(req.headers.host);
+              const message = {
+                from: "testalumniapp@gmail.com", // Sender address
+                to: req.body.email,         // recipients
+                subject: 'Account Verification Token', // Subject line
+                text: 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/alumni' + '\/confirmToken\/' + saveToken.token + '.\n'
+              }
+              transport.sendMail(message, function(err, info) {
+                  if (err) {
+                    console.log(err)
+                    res.send(err);
+                  } else {
+                    res.status = 200;
+                    res.send('A verification email has been sent to ' + req.body.email + '.');
+                  }
+              });
+                
+                
+  
+  
+  
+  
+            })
 
-          var token = authenticate.getToken({_id: newAlumni._id});
-          var saveToken = new Token({_userId:newAlumni._id , token:token });
-          
-          saveToken.save(function(err){
-            if(err){
-              res.status = 500;
-              res.send({message: err.message })
-            }
-
-              
-              
-              //send mail
-            console.log("HEADERS HOST");
-            console.log(req.headers.host);
-            const message = {
-              from: "testalumniapp@gmail.com", // Sender address
-              to: req.body.email,         // recipients
-              subject: 'Account Verification Token', // Subject line
-              text: 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/alumni' + '\/confirmToken\/' + saveToken.token + '.\n'
-            }
-            transport.sendMail(message, function(err, info) {
-                if (err) {
-                  console.log(err)
-                  res.send(err);
-                } else {
-                  res.status = 200;
-                  res.send('A verification email has been sent to ' + req.body.email + '.');
-                }
-            });
-              
-              
-
-
-
-
-          })
-
+          }
 
 
         });
@@ -239,11 +267,11 @@ router.get('/login',function(req,res){
 
 
 router.post('/login',async function(req,res){
-  var alumni = await AlumniBasicDetails.findOne({alumniName: req.body.alumniName,collegeName: req.body.collegeName});
+  var alumni = await AlumniBasicDetails.findOne({alumniEmail: req.body.email});
     if (!alumni) {
       res.statusCode = 400;
       res.setHeader('Content-Type', 'application/json');
-      res.json({status:"Alumni "+req.body.alumniName+" not found"});
+      res.json({status:"Alumni withe email : "+ req.body.email + "not found"});
       //return next(err);
     }
     else{

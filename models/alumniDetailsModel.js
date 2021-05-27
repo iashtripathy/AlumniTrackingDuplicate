@@ -6,43 +6,107 @@ var alumniDetailsSchema = new Schema({
         type: String,
         required: true
     },
-    email: {
+    alumniRollNo: {
+        type: String,
+        required : true
+    }, 
+    alumniEmail: {
         type: String,
         required: true,
         unique: true
     },
-    dob: {
-        type: Date,
-        required: true
+    alumniImage:{
+        url : String,
+        filename : String
     },
-    currentAddress: {
+    alumniPassword: {
+        type: String,
+        required: true,
+        unique: true   
+    },
+    hashPassword:{
+        type:String
+    },
+    alumniDegree:{
         type: String,
         required: true
     },
-    permanentAddress: {
+    alumniBranch: {
         type: String,
         required: true
     },
-    Interests: {
-       hackathons: {type: Boolean,default:false},
-       webinars: {type: Boolean,default:false},
-       others: {type: Boolean,default:false},
-    },
-    branch: {
+    alumniGraduationYear: {
         type: String,
         required: true
     },
-    passedOutYear: {
+    alumniAddress: {
+        type: String,
+        required: true
+    },  
+
+    alumniCurrentWorkingCompany: {
         type: String,
         required: true
     },
-    currentWorkingPlace: {
+    alumniDesignation: {
         type: String,
         required: true
     },
-    designation: {
+    alumniWorkExperience :{
         type: String,
-        required: true
+        required: true        
+    },
+    alumniCurrentLocationCity: {
+        type: String,
+        required: true        
+    },
+    alumniCurrentLocationZip: {
+        type: String,
+        required: true        
+    },
+    alumniCurrentLocationState: {
+        type: String,
+        required: true        
+    },
+    alumniCurrentLocationCountry: {
+        type: String,
+        required: true        
+    },
+    alumniHigherEducation :{
+        type : String,
+        required : true
+    },
+    alumniSkills :{
+        type : String,
+        required : true
+    },
+    alumniWebsite:{
+        type : String,
+        required : true
+    },
+    alumniLinkedin :{
+        type : String,
+        required : true
+    },
+    alumniGithub :{
+        type : String,
+        required : true
+    },
+    alumniInstagram :{
+        type : String,
+        required : true
+    },
+    alumniFacebook :{
+        type : String,
+        required : true
+    },
+    alumniTwitter :{
+        type : String,
+        required : true
+    },
+    isVerified:{ 
+        type: Boolean, 
+        default: false 
     }
 });
 var alumniDetails = mongoose.model('AlumniDetails', alumniDetailsSchema);
