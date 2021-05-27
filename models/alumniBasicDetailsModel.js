@@ -32,7 +32,15 @@ var alumniBasicDetailsSchema = new Schema({
     },
     hashPassword:{
         type:String
-    }
+    },
+    isVerified:{ 
+        type: Boolean, 
+        default: false 
+    },
+    passwordResetToken:{
+        type:String
+    },
+    passowrdResetExpires : Date
 });
 
 //alumniBasicDetailsSchema.plugin(passportLocalMongoose);

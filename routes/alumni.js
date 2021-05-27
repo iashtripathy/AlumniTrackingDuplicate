@@ -6,6 +6,7 @@ if(process.env.NODE_ENV !=="production"){
 var express = require('express');
 const bodyParser = require('body-parser');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
+var Token = require('../models/tokenModel');
 var passport = require('passport');
 var bcrypt = require('bcrypt');
 var multer = require('multer');
@@ -42,6 +43,22 @@ var upload = multer({storage});
 
 
 router.use(bodyParser.json());
+
+
+
+let transport = nodemailer.createTransport({
+  //  host: 'smtp.mailtrap.io',
+    service : 'gmail',
+  //  port: 2525,
+    auth: {
+       user: process.env.EMAIL,
+       pass: process.env.EMAIL_KEY
+    }
+});
+
+
+
+
 
 
 //
@@ -129,18 +146,91 @@ router.post('/register/basic', (req, res, next) => {
             res.setHeader('Content-Type', 'application/json');
             res.json({err: err});
           }
+
+          var token = authenticate.getToken({_id: newAlumni._id});
+          var saveToken = new Token({_userId:newAlumni._id , token:token });
+          
+          saveToken.save(function(err){
+            if(err){
+              res.status = 500;
+              res.send({message: err.message })
+            }
+
+              
+              
+              //send mail
+            console.log("HEADERS HOST");
+            console.log(req.headers.host);
+            const message = {
+              from: "testalumniapp@gmail.com", // Sender address
+              to: req.body.email,         // recipients
+              subject: 'Account Verification Token', // Subject line
+              text: 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/alumni' + '\/confirmToken\/' + saveToken.token + '.\n'
+            }
+            transport.sendMail(message, function(err, info) {
+                if (err) {
+                  console.log(err)
+                  res.send(err);
+                } else {
+                  res.status = 200;
+                  res.send('A verification email has been sent to ' + req.body.email + '.');
+                }
+            });
+              
+              
+
+
+
+
+          })
+
+
+
         });
         
         res.statusCode = 200;
-        console.log(req);
+        //console.log(req);
         console.log("--------------------");
-        console.log(res);
+        //console.log(res);
         res.setHeader('Content-Type', 'application/json');
-        res.json({success: true, status: 'Registration Successful!'});
+        res.json({success: true, status: 'Check Your email and verify token immediately'});
       }    
 
     })
 });
+
+
+router.get('/confirmToken/:token',function(req,res){
+
+  Token.findOne({ token: req.params.token }, function (err, token) {
+    if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
+
+    // If we found a token, find a matching user
+    AlumniBasicDetails.findOne({ _id: token._userId}, function (err, alumni) {
+        if (!alumni) return res.status(400).send({ msg: 'We were unable to find an alumni for this token.' });
+        if (alumni.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This alumni has already been verified.' });
+
+        // Verify and save the user
+        alumni.isVerified = true;
+        alumni.save(function (err) {
+            if (err) { return res.status(500).send({ msg: err.message }); }
+            Token.findOneAndRemove({_id: token._id , _userId : alumni._id },
+              function (err, docs) {
+                if (err){
+                  res.send(err);
+                }
+                else{
+                  console.log("Token Removed");
+                }
+            });
+            res.status(200).send("The account has been verified. Please log in.");
+        });
+    });
+  }); 
+
+})
+
+
 
 router.get('/login',function(req,res){
   console.log('Reached LoginPage ');
@@ -164,17 +254,46 @@ router.post('/login',async function(req,res){
         res.json({success:false,status:"Wrong password"});
       }
       else if(validPassword){
-        //res.setHeader('Content-Type', 'application/json');
-        var token = authenticate.getToken({_id: alumni._id});
-        //localStorage.setItem('alumnitoken', token);
-        //console.log("TOKEN-------------------",req);
-        //res.setHeader('Content-Type', 'application/json');
-        // Set-Cookie: <cookie-name>=<cookie-value>
-        res.cookie('alumnitoken', token);
-        res.cookie('userId' , alumni._id);
-        //res.json({success: true,status:'You are authenticated!',token:token});
 
-        res.redirect('/');
+        if(!alumni.isVerified){
+          if(Token.findOne({_userId : alumni._id})){
+            return res.status(401).send({ type: 'not-verified', msg: 'Your account has not been verified.Please Verify your account' });  
+          }
+          else{
+              
+              //Send token again as it is expired
+              const message = {
+                from: "testalumniapp@gmail.com", // Sender address
+                to: alumni.alumniEmail,         // recipients
+                subject: 'Account Verification Token', // Subject line
+                text: 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/alumni' + '\/confirmToken\/' + saveToken.token + '.\n'
+              };
+              transport.sendMail(message, function(err, info) {
+                  if (err) {
+                    console.log(err)
+                    res.send(err);
+                  } else {
+                    res.status = 200;
+                    res.send('A verification email has been sent again to ' + alumni.alumniEmail + '.');
+                  }
+              });
+          }
+          
+        } 
+        else{
+          var token = authenticate.getToken({_id: alumni._id});
+
+          // Set-Cookie: <cookie-name>=<cookie-value>
+          res.cookie('alumnitoken', token);
+          res.cookie('userId' , alumni._id);
+  
+  
+          res.redirect('/');
+        }
+
+
+
+ 
        
       }
     }
