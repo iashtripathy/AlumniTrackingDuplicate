@@ -40,7 +40,9 @@
       height:60px !important;
       max-height:inherit !important;
     }
-
+    #highlightId{
+      font-weight:bold;
+    }
 
 
     /*---------------------------------------Click on the card to popup the modal on the screen---------------------------------------------------------------*/
@@ -195,7 +197,10 @@
       <div class="modal-content">
         <span class="close" onclick="closeDescription()">&times;</span>
         <h2 style="text-align:center;">Description About Event</h2>
-        <p id="desc" style="word-break:break-word;">Some text in the Modal..</p>
+        <% if(user_type['admin']){ %>
+          <span id="highlightId"></span>
+        <% } %>
+          <p id="desc" style="word-break:break-word;">Some text in the Modal..</p>
       </div>
 
     </div>
@@ -234,13 +239,13 @@
           <% } else{ %> 
             <% limit = 4 %>
           <% } %>
-
+          
 
           <% for(var i = 0; i < limit; i++ ) {%>
           
           <div class="myBtn col-lg-3 col-md-6" style="margin-bottom:25px;">
               <div class="box" style="height:100%;" data-aos="fade-up">
-                <div id="box-content" style="height:84%;" onclick = "sendData(`<%= events[i].description %>`)" >
+                <div id="box-content" style="height:84%;" onclick = "sendData(`<%= events[i].description %>` , '<%= events[i]._id %>')" >
                   <h5 style="font-weight:bold;color:rgb(133, 192, 44);"><%= events[i].title %></h5>
                   <ul style="line-height:normal;">
                     <% var data = events[i].description; %>
@@ -288,15 +293,23 @@
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <script>
-    function sendData(text){
-      
+    function sendData(text,id){
+      console.log(id);
       var modal = document.getElementById("myModal");
 
       var btn = document.getElementById("myBtn");
     
       var desc = document.getElementById("desc")
-      console.log(text)
-      desc.innerText = text;
+      
+      var high = document.getElementById("highlightId")
+      var temp = ' Id : ' + id;
+
+      if(high!==null){
+        high.innerText = temp
+      }
+      
+      desc.innerText = '\n' + text ;
+      
       modal.style.display = "block";
     
       // When the user clicks anywhere outside of the modal, close it

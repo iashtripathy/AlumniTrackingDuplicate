@@ -65,6 +65,7 @@ router.get('/details',[presentVerifying,authenticate.verifyUser],async function(
   userType['viewer'] = false;
   let user;
   const alumnis = await AlumniBasicDetails.find({}).select(['-alumniPassword','-hashPassword']);
+/*   const events = await Event.find() */
   if(isLoggedIn(req.cookies.alumnitoken)){
     userType['alumni'] = true
     user = await AlumniBasicDetails.findById(req.cookies.userId);
@@ -384,7 +385,17 @@ let transport = nodemailer.createTransport({
     console.log('sending email..');
     email = []
     const alumni = await AlumniBasicDetails.find();
-    for(var i=0;i<alumni.length;i++){
+    var temp = req.body.recipients
+    temp = temp.toLowerCase()
+    var end;
+    if(temp!=="all"){
+      const events = await Event.findById(req.body.recipients);
+      end = events.attendees.length
+    }
+    else{
+      end = alumni.length
+    }
+    for(var i=0;i<end;i++){
       email.push(alumni[i].alumniEmail);
     }
 

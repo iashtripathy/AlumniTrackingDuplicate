@@ -70,21 +70,131 @@ router.get('/',function(req,res,next){
 
 
 
+/*--------------------------------------------------------------Forgot Password Beginning----------------------------------------------------------*/
+
+//When the user clicks on forgot password this is the page rendered.
+router.get('/forgotPassword',function(req,res,next){
+  res.render('alumniLogin',{type : 'forgotPassword'})
+})
+
+
+//This post request is made when the user enters his registered email id to change the password.Now here the password changing link is sent to user
+router.post('/forgotPassword',async function(req,res,next){
+
+  AlumniBasicDetails.findOne({alumniEmail:req.body.email},async function(err,alumni){
+
+    if(err) {
+      console.log("inside");
+      console.log(err);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});
+    }
+    else if(alumni){
+      var token = authenticate.getToken({_id: alumni._id});
+      var saveToken = new Token({_userId:alumni._id , token:token });
+
+      saveToken.save(function(err){
+        if(err){
+          res.status = 500;
+          res.send({message: err.message })
+        }
+
+        console.log("HEADERS HOST");
+        console.log(req.headers.host);
+        const message = {
+          from: "testalumniapp@gmail.com", // Sender address
+          to: req.body.email,         // recipients
+          subject: 'Password Resetting Link', // Subject line
+          text: 'Please click on the link to change password: \nhttp:\/\/' + req.headers.host + '\/alumni' + '\/changePassword\/' + saveToken.token + '\/' + req.body.email + '.\n'
+        }
+        transport.sendMail(message, function(err, info) {
+            if (err) {
+              console.log(err)
+              res.send(err);
+            } else {
+              res.status = 200;
+              res.send('Change Password link has been sent to ' + req.body.email + '.');
+            }
+        });
 
 
 
+      })    
+
+    }
+    else{
+      res.statusCode = 200;
+      //console.log(req);
+      console.log("--------------------");
+      //console.log(res);
+      res.setHeader('Content-Type', 'application/json');
+      res.json({success: false, status: 'Alumni with the entered email isnt found.Please go back and try again'});      
+    }
+  })
+ /*  else{
+    res.status = 500;
+    res.send({result:"No alumni with the entered email found.Please recheck the email and try again!"});
+  } */
+})
 
 
 
+//This renders the page where user enters the new password.This stages is reached immediately after the link is verifies through email by the alumni
+router.get('/changePassword/:token/:regEmail',function(req,res,next){
 
-/* router.get('/forgotPassword',function(req,res,next){
-  var transporter = nodemailer.createTransport({ service: 'Sendgrid', auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD } });
-  var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
-  transporter.sendMail(mailOptions, function (err) {
-      if (err) { return res.status(500).send({ msg: err.message }); }
-      res.status(200).send('A verification email has been sent to ' + user.email + '.');
-  });
-}) */
+  Token.findOne({ token: req.params.token }, function (err, token) {
+    if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
+
+    res.render('alumniLogin',{type : 'changePassword',email: req.params.regEmail })
+  }); 
+
+})
+
+
+//Final put request to update the password after the user enters the new password and hits submit
+
+router.put('/updatePassword',async function(req,res,next){
+  console.log(req.body.email);
+  const alumni = await AlumniBasicDetails.findOne({alumniEmail : req.body.email});
+  // Verify and save the user
+  //alumni.alumniPassword = req.body.password;
+  
+  const salt = await bcrypt.genSalt(10);
+  hashPassword = await bcrypt.hash(req.body.password,salt);
+  const update = await AlumniBasicDetails.findByIdAndUpdate(alumni._id, {
+    $set : {alumniPassword : req.body.password , hashPassword : hashPassword}
+  }, { new: true })
+    .then((alumni) => {
+
+
+      Token.findOneAndRemove({_userId : alumni._id },
+        function (err, docs) {
+          if (err){
+            console.log("Token Error")
+            res.send(err);
+          }
+          else{
+            console.log("Token Removed");
+          }
+      });
+  
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      //res.redirect('/alumni/currentAlumniDetails');
+      res.redirect('/alumni/login');
+  }, (err) => next(err))
+    .catch((err) => console.log("Here is errror",err)
+  )
+
+
+ 
+
+})
+
+
+/*--------------------------------------------------------------Forgot Password Ending----------------------------------------------------------*/
+
 
 
 
@@ -262,7 +372,7 @@ router.get('/confirmToken/:token',function(req,res){
 
 router.get('/login',function(req,res){
   console.log('Reached LoginPage ');
-    res.render('alumniLogin');
+    res.render('alumniLogin',{type : 'login'});
 });
 
 
@@ -566,8 +676,8 @@ router.put('/attendEvent/:event_id',[presentVerifying,authenticate.verifyUser],a
       //res.redirect('/alumni/currentAlumniDetails');
       //res.json(event);
       res.redirect('/events');
-  }, (err) => next(err))
-  .catch((err) => next(err))
+    }, (err) => next(err))
+    .catch((err) => next(err))
   }
   
 

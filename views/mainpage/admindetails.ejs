@@ -9,7 +9,10 @@
   <meta content="" name="description">
   <meta content="" name="keywords">
 
-  
+
+
+
+
   <!-- Favicons -->
   <link href="../../public/styles/assets/img/favicon.png" rel="icon">
   <link href="../../public/styles/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
@@ -117,12 +120,16 @@
 
     <!-- ======= Contact Section ======= -->
     <section id="contact" class="contact">
-        
-      <div class="container">
+       
+      <div class="container" style="width:80vw !important;">
           <% if(user_type['admin']){ %>
-            <div class="col-lg-8 mt-5 mt-lg-0" data-aos="fade-left" style="width:80vw !important;">
-              <h4>Send Notification to Alumni</h4>  
+            <div class="col-lg-8 mt-5 mt-lg-0" data-aos="fade-left" >
+              <h3>Send Notification to Alumni</h3>  
               <form action="/admin/sendmail" method="post">
+                <span style="opacity:0.8;">Note : To send a notification to everyone type <span style="font-weight:bold;">ALL</span>.To send people registered for specific event,enter the <span style="font-weight:bold;">EVENT ID</span> of the specific event in recipients text box</span>
+                <div class="form-group mt-3">
+                  <input type="text" class="form-control" name="recipients" id="recipients" placeholder="Recipients" required>
+                </div>
                 <div class="form-group mt-3">
                   <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
                 </div>
@@ -141,6 +148,8 @@
 
 
       </div>
+
+      
     </section><!-- End Contact Section -->
 
   </main><!-- End #main -->
