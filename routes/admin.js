@@ -556,7 +556,7 @@ let transport = nodemailer.createTransport({
       }
     }
 
-
+    console.log(email);
     const message = {
       from: "testalumniapp@gmail.com", // Sender address
       to: email,         // recipients

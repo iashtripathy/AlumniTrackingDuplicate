@@ -655,6 +655,7 @@ router.put('/editblog/:id',[presentVerifying,authenticate.verifyUser],upload.sin
     let desc = req.body.description;
     _markdown = desc.substr(0,65) + " ...";
     const update = await Blog.findByIdAndUpdate(id, {
+        title : req.body.title,
         description : _markdown , 
         markdown : req.body.description,
         blogImage : image
