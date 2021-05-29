@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 var AdminDetails = require('../models/adminModel');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
 var Event = require('../models/eventsModel');
+var Token = require('../models/tokenModel');
 var passport = require('passport');
 var bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
@@ -85,7 +86,7 @@ router.get('/details',[presentVerifying,authenticate.verifyUser],async function(
 router.post('/register', (req, res, next) => {
   console.log("Registrating");
   console.log(req.body);
-  AdminDetails.findOne({username:req.body.username, password:req.body.password},async function(err,admin){
+  AdminDetails.findOne({email:req.body.email, password:req.body.password},async function(err,admin){
     if(err) {
       console.log("inside");
       console.log(err);
@@ -164,13 +165,13 @@ router.post('/updateCredentials',[presentVerifying,authenticate.verifyUser], (re
 });
 
 router.get('/login',function(req,res){
-    res.render('adminLogin');
+    res.render('adminLogin',{type:'login'});
 });
 
 
 router.post('/login',async function(req,res){
   console.log(req.body.username);
-  var admin = await AdminDetails.findOne({username: req.body.username});
+  var admin = await AdminDetails.findOne({email: req.body.email});
     if (!admin) {
       res.statusCode = 400;
       res.setHeader('Content-Type', 'application/json');
@@ -198,20 +199,158 @@ router.post('/login',async function(req,res){
 });
   
 
+/*--------------------------------------------------------------Forgot Password Beginning----------------------------------------------------------*/
+
+//When the user clicks on forgot password this is the page rendered.
+router.get('/forgotPassword',function(req,res,next){
+  res.render('adminLogin',{type : 'forgotPassword'})
+})
 
 
-  
-/*router.put('/updateDetails',authenticate.verifyUser, (req, res, next) => {
-  AlumniBasicDetails.findByIdAndUpdate(req.params.dishId, {
-      $set: req.body
-  }, { new: true })
-  .then((dish) => {
-      res.statusCode = 200;
+//This post request is made when the user enters his registered email id to change the password.Now here the password changing link is sent to user
+router.post('/forgotPassword',async function(req,res,next){
+
+  AdminDetails.findOne({email:req.body.email},async function(err,admin){
+
+    if(err) {
+      //console.log("inside");
+      console.log(err);
+      res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      res.json(dish);
-  }, (err) => next(err))
-  .catch((err) => next(err));
-}) */
+      res.json({err: err});
+    }
+    else if(admin){
+      var token = authenticate.getToken({_id: admin._id});
+      var saveToken = new Token({_userId:admin._id , token:token });
+
+      saveToken.save(function(err){
+        if(err){
+          res.status = 500;
+          res.send({message: err.message })
+        }
+
+        console.log("HEADERS HOST");
+        console.log(req.headers.host);
+        const message = {
+          from: "testalumniapp@gmail.com", // Sender address
+          to: req.body.email,         // recipients
+          subject: 'Password Resetting Link', // Subject line
+          text: 'Please click on the link to change password: \nhttp:\/\/' + req.headers.host + '\/admin' + '\/changePassword\/' + saveToken.token + '\/' + req.body.email + '.\n'
+        }
+        transport.sendMail(message, function(err, info) {
+            if (err) {
+              console.log(err)
+              res.send(err);
+            } else {
+              res.status = 200;
+              res.send('Change Password link has been sent to ' + req.body.email + '.');
+            }
+        });
+
+
+
+      })    
+
+    }
+    else{
+      res.statusCode = 200;
+      //console.log(req);
+      console.log("--------------------");
+      //console.log(res);
+      res.setHeader('Content-Type', 'application/json');
+      res.json({success: false, status: 'Admin with the entered email isnt found.Please go back and try again'});      
+    }
+  })
+ /*  else{
+    res.status = 500;
+    res.send({result:"No alumni with the entered email found.Please recheck the email and try again!"});
+  } */
+})
+
+
+
+//This renders the page where user enters the new password.This stages is reached immediately after the link is verifies through email by the alumni
+router.get('/changePassword/:token/:regEmail',function(req,res,next){
+  AdminDetails.findOne({email : req.params.regEmail},function(err,admin){
+    if(err){
+      console.log(err);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});      
+    }
+    else if(admin){
+      Token.findOne({ token: req.params.token }, function (err, token) {
+        if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token for the Email Id. Your token my have expired.' });
+    
+        res.render('adminLogin',{type : 'changePassword',email: req.params.regEmail })
+      }); 
+    }
+    else{
+      res.status = 200
+      res.send({success: false, status: 'Admin with the entered email isnt found.Please go back and try again'})
+    }
+  })
+
+
+})
+
+
+//Final put request to update the password after the user enters the new password and hits submit
+
+router.put('/updatePassword',async function(req,res,next){
+  console.log(req.body.email);
+  
+  // Verify and save the user
+  //alumni.alumniPassword = req.body.password;
+  await AdminDetails.findOne({email : req.body.email},async function(err,admin){
+    if(err) {
+      //console.log("inside");
+      console.log(err);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});
+    }
+    else if(admin){
+      const salt = await bcrypt.genSalt(10);
+      hashPassword = await bcrypt.hash(req.body.password,salt);
+      const update = await AdminDetails.findByIdAndUpdate(admin._id, {
+        $set : {password : req.body.password , hashPassword : hashPassword}
+      }, { new: true })
+        .then((admin) => {
+    
+    
+          Token.findOneAndRemove({_userId : admin._id },
+            function (err, docs) {
+              if (err){
+                console.log("Token Error")
+                res.send(err);
+              }
+              else{
+                console.log("Token Removed");
+              }
+          });
+      
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          //res.redirect('/alumni/currentAlumniDetails');
+          res.redirect('/admin/login');
+      }, (err) => next(err))
+        .catch((err) => console.log("Here is errror",err)
+      )
+    
+    }
+    else{
+
+    }
+  });
+
+
+ 
+
+})
+
+
+/*--------------------------------------------------------------Forgot Password Ending----------------------------------------------------------*/
 
 
  
@@ -389,15 +528,34 @@ let transport = nodemailer.createTransport({
     temp = temp.toLowerCase()
     var end;
     if(temp!=="all"){
-      const events = await Event.findById(req.body.recipients);
-      end = events.attendees.length
+      Event.findById({_id : req.body.recipients},async function(err,event){
+        if(err) {
+          //console.log("inside");
+          console.log(err);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({err: err});
+        }   
+        else if(event){
+          //console.log()
+          end = event.attendies.length
+          for(var i=0;i<end;i++){
+            email.push(event.attendies[i]);
+          }
+        }
+        else{
+          res.json({success: failed, status: 'No event with the entered Id could be found'});
+        }
+      });
+
     }
-    else{
+    else if(temp==="all"){
       end = alumni.length
+      for(var i=0;i<end;i++){
+        email.push(alumni[i].alumniEmail);
+      }
     }
-    for(var i=0;i<end;i++){
-      email.push(alumni[i].alumniEmail);
-    }
+
 
     const message = {
       from: "testalumniapp@gmail.com", // Sender address

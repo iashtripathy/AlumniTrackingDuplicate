@@ -142,12 +142,26 @@ router.post('/forgotPassword',async function(req,res,next){
 
 //This renders the page where user enters the new password.This stages is reached immediately after the link is verifies through email by the alumni
 router.get('/changePassword/:token/:regEmail',function(req,res,next){
+  const alumni = AlumniBasicDetails.findOne({alumniEmail : req.params.regEmail},function(err,alumni){
+    if(err){
+      console.log(err);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});      
+    }
+    else if(alumni){
+      Token.findOne({ token: req.params.token }, function (err, token) {
+        if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token for the Email Id. Your token my have expired.' });
+    
+        res.render('alumniLogin',{type : 'changePassword',email: req.params.regEmail })
+      }); 
+    }
+    else{
+      res.status = 200
+      res.send({success: false, status: 'Alumni with the entered email isnt found.Please go back and try again'})
+    }
+  })
 
-  Token.findOne({ token: req.params.token }, function (err, token) {
-    if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
-
-    res.render('alumniLogin',{type : 'changePassword',email: req.params.regEmail })
-  }); 
 
 })
 
@@ -156,36 +170,50 @@ router.get('/changePassword/:token/:regEmail',function(req,res,next){
 
 router.put('/updatePassword',async function(req,res,next){
   console.log(req.body.email);
-  const alumni = await AlumniBasicDetails.findOne({alumniEmail : req.body.email});
+  
   // Verify and save the user
   //alumni.alumniPassword = req.body.password;
-  
-  const salt = await bcrypt.genSalt(10);
-  hashPassword = await bcrypt.hash(req.body.password,salt);
-  const update = await AlumniBasicDetails.findByIdAndUpdate(alumni._id, {
-    $set : {alumniPassword : req.body.password , hashPassword : hashPassword}
-  }, { new: true })
-    .then((alumni) => {
-
-
-      Token.findOneAndRemove({_userId : alumni._id },
-        function (err, docs) {
-          if (err){
-            console.log("Token Error")
-            res.send(err);
-          }
-          else{
-            console.log("Token Removed");
-          }
-      });
-  
-      res.statusCode = 200;
+  await AlumniBasicDetails.findOne({alumniEmail : req.body.email},async function(err,alumni){
+    if(err) {
+      //console.log("inside");
+      console.log(err);
+      res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      //res.redirect('/alumni/currentAlumniDetails');
-      res.redirect('/alumni/login');
-  }, (err) => next(err))
-    .catch((err) => console.log("Here is errror",err)
-  )
+      res.json({err: err});
+    }
+    else if(alumni){
+      const salt = await bcrypt.genSalt(10);
+      hashPassword = await bcrypt.hash(req.body.password,salt);
+      const update = await AlumniBasicDetails.findByIdAndUpdate(alumni._id, {
+        $set : {alumniPassword : req.body.password , hashPassword : hashPassword}
+      }, { new: true })
+        .then((alumni) => {
+    
+    
+          Token.findOneAndRemove({_userId : alumni._id },
+            function (err, docs) {
+              if (err){
+                console.log("Token Error")
+                res.send(err);
+              }
+              else{
+                console.log("Token Removed");
+              }
+          });
+      
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          //res.redirect('/alumni/currentAlumniDetails');
+          res.redirect('/alumni/login');
+      }, (err) => next(err))
+        .catch((err) => console.log("Here is errror",err)
+      )
+    
+    }
+    else{
+
+    }
+  });
 
 
  
