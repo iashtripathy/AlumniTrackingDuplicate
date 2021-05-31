@@ -11,7 +11,7 @@ exports.getToken = function(user) {
 
 
 exports.verifyUser = function(req,res,next){
-    //const token = req.header('x-auth-token');
+    
     //console.log("Name "+req.name);   
     //console.log("TOKEN IS FOUND HERE-------",req.headers.authorization);
     var token;
