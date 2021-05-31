@@ -127,6 +127,7 @@ app.use(function(err, req, res, next) {
   res.send(err);
 });
 
-app.listen(3000, () => console.log('Server started'));
+const port = process.env.PORT || 3000
+app.listen(port,() => console.log('Server started'));
 
 module.exports = app;
