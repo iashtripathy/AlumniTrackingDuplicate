@@ -69,22 +69,6 @@ connect.then((db) => {
 app.set('views', path.join(__dirname, 'views'));
 
 app.set('view engine', 'ejs');
-/* var hbs = expressHbs.create({});
-
-hbs.handlebars.registerHelper('for', function(from, to, incr, block) {
-  var accum = '';
-  for(var i = from; i < to; i += incr)
-      accum += block.fn(i);
-  return accum;
-});    */
-
-
-
-
-
-
-
-
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -100,14 +84,6 @@ app.use('/admin',admin);
 app.use('/alumni', alumni);
 
 app.use(express.static('.'));
-//app.use(express.static(path.join(__dirname, 'public/styles')));
-//app.use('/college',college);
-//app.use('/admin',admin);
-
-
-
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
