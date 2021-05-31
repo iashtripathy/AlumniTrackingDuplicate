@@ -258,7 +258,8 @@ router.get('/currentAlumniDetails',[presentVerifying,authenticate.verifyUser],as
 
 router.post('/register/basic', (req, res, next) => {
     console.log("Registrating");
-    //console.log(req.body);
+
+    
     AlumniBasicDetails.findOne({alumniEmail:req.body.email},async function(err,alumni){
       if(err) {
         console.log("inside");
@@ -299,11 +300,11 @@ router.post('/register/basic', (req, res, next) => {
           alumniInstagram : req.body.instagram,
           alumniFacebook : req.body.facebook,
           alumniTwitter : req.body.twitter,
-          alumniPassword:req.body.password, 
+        
           hashPassword:req.body.password
         });
         const salt = await bcrypt.genSalt(10);
-        newAlumni.hashPassword = await bcrypt.hash(newAlumni.alumniPassword,salt);
+        newAlumni.hashPassword = await bcrypt.hash(req.body.password,salt);
         await newAlumni.save((err)=>{
           if(err){
             console.log(err);
@@ -389,7 +390,7 @@ router.get('/confirmToken/:token',function(req,res){
                   console.log("Token Removed");
                 }
             });
-            res.status(200).send("The account has been verified. Please log in.");
+            res.status(200).send('Your account has been verified.You can login now');
         });
     });
   }); 
@@ -527,7 +528,7 @@ router.put('/updateDetails/:id',[presentVerifying,authenticate.verifyUser],uploa
 router.get('/logout', (req, res) => {
   //console.log(req.headers);
 
-    res.setHeader('Content-Type','application/json');
+    //res.setHeader('Content-Type','application/json');
     res.cookie('alumnitoken','');
     res.cookie('userId','');
     //res.json({success: true,status:"Logged Out Successfully"});
@@ -598,7 +599,8 @@ router.post('/createdPost/:id',[presentVerifying,authenticate.verifyUser],upload
 });
 
 router.get('/showblogs',async function(req,res,next){
-  const blogs = await Blog.find().sort({ createdAt: 'desc' })
+  //const blogs = await Blog.find().sort({ createdAt: 'desc' })
+  res.send(blogs);
   res.render('../views/mainpage/blog/index', { articles: blogs })
 })
 

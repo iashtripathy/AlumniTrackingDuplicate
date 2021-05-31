@@ -22,7 +22,7 @@ var upload = multer({storage});
 
 
 
-//for faking a post request as put for updating data
+//for faking a post request as put or delete for updating data
 var methodOverride = require('method-override');
 router.use(methodOverride('_method'));
 
@@ -485,10 +485,7 @@ router.delete('/deletejob/:job_id',[presentVerifying,authenticate.verifyUser], a
   //console.log(id);
 
   const job = await Job.findById(req.params.job_id);
-  //console.log(req.cookies.userId,blog.userId,req.cookies.adminId);
-  //console.log( (req.cookies.userId!=="undefined" && req.cookies.userId === blog.userId) )
-  //console.log( typeof(req.cookies.adminId) === "undefined" );
-  //console.log(req.cookies.adminId)
+
   if( (req.cookies.userId!=="undefined" && req.cookies.userId === job.uploadedByUserId) || (typeof(req.cookies.admintoken)!=="undefined") ){
 
   

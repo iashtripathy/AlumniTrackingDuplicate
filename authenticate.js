@@ -5,8 +5,8 @@ var LocalStorage = require('node-localstorage').LocalStorage;
 var localStorage = LocalStorage('./tokens');
 
 exports.getToken = function(user) {
-    return jwt.sign(user, config.secretKey/* ,
-        {expiresIn: 3600} */);
+    return jwt.sign(user, process.env.SECRET_KEY ,
+        /*{expiresIn: "60s"}*/ );
 };
 
 
@@ -34,7 +34,7 @@ exports.verifyUser = function(req,res,next){
     }
     if(token){
         try{
-            const tokenDecoded = jwt.verify(token,config.secretKey);
+            const tokenDecoded = jwt.verify(token,process.env.SECRET_KEY);
             //console.log(tokenDecoded);
             //user is useful in /surrentUserDetails route
             req.user = tokenDecoded;

@@ -7,11 +7,11 @@ var adminSchema = new Schema({
         required: true,
         unique: true
     },
-    password: {
+/*     password: {
         type: String,
         required: true,
         unique: true
-    },
+    }, */
     hashPassword: {
         type: String
     }

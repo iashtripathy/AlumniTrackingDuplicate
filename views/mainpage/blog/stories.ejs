@@ -115,7 +115,15 @@
         <div class="row">
 
           <div class="col-lg-8 entries"  id="myTable">
-            <% for (var i =0; i < articles.length;  i++ ) { %>
+
+            <% var limit; %>
+            <% if(articles.length< 4){ %>
+              <% limit =  articles.length %>
+            <% } else{ %> 
+              <% limit = 4 %>
+            <% } %>
+
+            <% for (var i =0; i < limit;  i++ ) { %>
               <article class="entry">
 
                 <div class="entry-img">
@@ -175,7 +183,15 @@
 
               <h3 class="sidebar-title">Recent Posts</h3>
               <div class="sidebar-item recent-posts">
-                <% for (var i =0; i < 5;  i++ ) { %>
+  
+                <% var limit; %>
+                <% if(articles.length< 4){ %>
+                  <% limit =  articles.length %>
+                <% } else{ %> 
+                  <% limit = 4 %>
+                <% } %>
+
+                <% for (var i =0; i < limit;  i++ ) { %>
                   <div class="post-item clearfix">
                     <img src="<%= articles[i].blogImage.url %>" alt="">
                     <h4><a href="/storySingle/<%=articles[i]._id%>"><%= articles[i].title %></a></h4>

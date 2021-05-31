@@ -1,19 +1,25 @@
+if(process.env.NODE_ENV !=="production"){
+  require('dotenv').config();
+}
+
 var express = require('express');
+
 var path = require('path');
+
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+//var session = require('express-session');
 
 
-var FileStore = require('session-file-store')(session);
-var LocalStorage = require('node-localstorage').LocalStorage;
-var localStorage = new LocalStorage('./tokens');
+//var FileStore = require('session-file-store')(session);
+//var LocalStorage = require('node-localstorage').LocalStorage;
+//var localStorage = new LocalStorage('./tokens');
 var app = express();
+
 var index = require('./routes/index');
 var alumni = require('./routes/alumni');
-var college = require('./routes/college');
 var admin = require('./routes/admin');
 
 var config = require('./config');
@@ -37,15 +43,25 @@ app.use(cookieParser());
 
 
 // Connection URL
-const url = config.mongoUrl;
+//const url = config.mongoUrl;
+const url = process.env.DB_URL || 'mongodb://localhost:27017/AlumniTrackingDatabaseDuplicate'
 const connect = mongoose.connect(url, {
-    useMongoClient: true,
+  
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex : true,
+  useFindAndModify : false
+ 
+});
 
-  });
+
 
 connect.then((db) => {
     console.log("Connected correctly to server");
 }, (err) => { console.log(err); });
+
+
+
 
 // view engine setup
 

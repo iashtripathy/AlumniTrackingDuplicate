@@ -27,14 +27,7 @@ router.use(bodyParser.json());
 var methodOverride = require('method-override');
 router.use(methodOverride('_method'));
 
-//
-router.get('/',function(req,res,next){
-    res.render('adminLogin');
-})
 
-/* router.get('/details',function(req,res,next){
-  res.send('Admin Details Page');
-}) */
 
 
 function isLoggedIn(token){
@@ -58,7 +51,7 @@ function presentVerifying(req,res,next){
 
 
 
-
+//Admin Details page => send mails to all 
 router.get('/details',[presentVerifying,authenticate.verifyUser],async function(req,res){
   let userType = new Map()
   userType['alumni'] = false;
@@ -83,7 +76,7 @@ router.get('/details',[presentVerifying,authenticate.verifyUser],async function(
 
 
 
-router.post('/register', (req, res, next) => {
+/* router.post('/register', (req, res, next) => {
   console.log("Registrating");
   console.log(req.body);
   AdminDetails.findOne({email:req.body.email, password:req.body.password},async function(err,admin){
@@ -121,9 +114,7 @@ router.post('/register', (req, res, next) => {
     }
   })  
 });
-
-
-
+ 
 
 
 
@@ -163,6 +154,8 @@ router.post('/updateCredentials',[presentVerifying,authenticate.verifyUser], (re
 
     })
 });
+
+*/
 
 router.get('/login',function(req,res){
     res.render('adminLogin',{type:'login'});
@@ -314,7 +307,7 @@ router.put('/updatePassword',async function(req,res,next){
       const salt = await bcrypt.genSalt(10);
       hashPassword = await bcrypt.hash(req.body.password,salt);
       const update = await AdminDetails.findByIdAndUpdate(admin._id, {
-        $set : {password : req.body.password , hashPassword : hashPassword}
+        $set : {hashPassword : hashPassword}
       }, { new: true })
         .then((admin) => {
     

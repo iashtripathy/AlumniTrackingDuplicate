@@ -20,11 +20,11 @@ var alumniBasicDetailsSchema = new Schema({
         url : String,
         filename : String
     },
-    alumniPassword: {
+/*     alumniPassword: {
         type: String,
         required: true,
         unique: true   
-    },
+    }, */
     hashPassword:{
         type:String
     },
