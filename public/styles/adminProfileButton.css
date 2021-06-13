@@ -1,0 +1,8 @@
+/* Admin login button */
+@media screen and (max-width: 1399px) and (min-width: 1101px) {
+    .getstarted {
+      font-size: 0.8em !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+  }

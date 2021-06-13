@@ -33,6 +33,7 @@
   <!-- Template Main CSS File -->
   <link href="../../public/styles/assets/css/style.css" rel="stylesheet">
   <link href="../../public/styles/modalStyle.css" rel="stylesheet">
+  <link href="../../public/styles/adminProfileButton.css" rel="stylesheet">
 
   <style>
     .image{
@@ -40,9 +41,13 @@
       height:60px !important;
       max-height:inherit !important;
     }
+
     #highlightId{
       font-weight:bold;
     }
+    .myBtn.col-lg-3.col-md-6 {
+      min-width: 330px !important;
+    }    
 
 
     /*---------------------------------------Click on the card to popup the modal on the screen---------------------------------------------------------------*/
@@ -260,7 +265,7 @@
               </div>
                 
                 <% if(user_type['admin']){ %>
-                  <a href="/admin/editEvent/<%= events[i]._id %>" class="btn-buy" style="float:left;margin-left:35px;">Edit</a>
+                  <a href="/admin/editEvent/<%= events[i]._id %>" class="btn-buy" style="float:left;margin-left:20%;">Edit</a>
                   <form action="/admin/deleteEvent/<%= events[i]._id %>?_method=DELETE" method="post">
                     <button type="submit" style="border-style:hidden;" class="btn-buy" >Delete</button>
                   </form>

@@ -350,17 +350,19 @@ router.post('/register/basic', (req, res, next) => {
   
             })
 
+            res.statusCode = 200;
+            //console.log(req);
+            console.log("--------------------");
+            //console.log(res);
+            res.setHeader('Content-Type', 'application/json');
+            res.json({success: true, status: 'Check Your email and verify token immediately'});
+
           }
 
 
         });
         
-        res.statusCode = 200;
-        //console.log(req);
-        console.log("--------------------");
-        //console.log(res);
-        res.setHeader('Content-Type', 'application/json');
-        res.json({success: true, status: 'Check Your email and verify token immediately'});
+
       }    
 
     })

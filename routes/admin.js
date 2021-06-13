@@ -8,6 +8,8 @@ const bodyParser = require('body-parser');
 var AdminDetails = require('../models/adminModel');
 var AlumniBasicDetails = require('../models/alumniBasicDetailsModel');
 var Event = require('../models/eventsModel');
+const Blog = require('../models/blogModel')
+const Job = require('../models/jobModel');
 var Token = require('../models/tokenModel');
 var passport = require('passport');
 var bcrypt = require('bcrypt');
@@ -114,48 +116,10 @@ router.get('/details',[presentVerifying,authenticate.verifyUser],async function(
     }
   })  
 });
- 
+ */
 
 
 
-router.get('/updateCredentials',function(req,res){
-    res.render('adminUpdate');
-});
-//for updating
-router.post('/updateCredentials',[presentVerifying,authenticate.verifyUser], (req, res, next) => {
-    AdminDetails.findById({_id:'5e2db3d930a0e9312f356c7c'},async function(err,admin){
-      if(err) {
-        console.log("inside");
-        console.log(err);
-        res.statusCode = 500;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({err: err});
-      }
-      else{
-        admin.username = req.body.username; 
-        admin.password = req.body.password;
-        admin.hashPassword = req.body.password;
-        const salt = await bcrypt.genSalt(10);
-        admin.hashPassword = await bcrypt.hash(admin.password,salt);
-        await admin.save((err)=>{
-          if(err){
-            console.log(err);
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.json({err: err});
-          }
-        });
-        console.log(admin);
-        res.statusCode = 200;
-        
-        res.setHeader('Content-Type', 'application/json');
-        res.json({success: true, status: 'Updation Successful!'});
-      }    
-
-    })
-});
-
-*/
 
 router.get('/login',function(req,res){
     res.render('adminLogin',{type:'login'});
@@ -352,18 +316,61 @@ router.delete('/deleteuser/:id',[presentVerifying,authenticate.verifyUser], asyn
   console.log(id);
 
   const admin = await AdminDetails.findById(req.cookies.userId);
+  //const blogs = await Blog.find({userId :  id });
+  //const job = await Job.find({uploadedByUserId: req.params.id});
+
+
   //console.log("---------------------------------------Type is-----------------------------------------------------------")
   //console.log(typeof(admin));
   if(typeof(admin)!==undefined){
 
     //for deleting the alumni image from the cloudinary database
     const alumni = await AlumniBasicDetails.findById(req.params.id);
+    const email = alumni.alumniEmail;    
     imageFilename = alumni.alumniImage.filename;
 
     if(alumni.alumniImage.url!=="https://res.cloudinary.com/dzxf40jom/image/upload/v1621967741/Alumni/gdqldyoge92sbmdw2ein.png"){
       await cloudinary.uploader.destroy(imageFilename);
     }
 
+    await Blog.deleteMany({userId :  id }).then(function(){
+      console.log("All blogs posted by this user deleted"); // Success
+    }).catch(function(error){
+        console.log(error); // Failure
+    });
+
+    await Job.deleteMany({uploadedByUserId :  id }).then(function(){
+      console.log("All jobs posted by this user deleted"); // Success
+    }).catch(function(error){
+        console.log(error); // Failure
+    });
+
+    Event.find({},function(err,events){
+
+      if(err) {
+        //console.log("inside");
+        console.log(err);
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({err: err});
+      }
+      else{
+        for(var i=0;i<events.length;i++){
+          if(events[i].attendies.find(emailId => emailId === email)!== "undefined"){
+            var index = events[i].attendies.indexOf(email)
+            events[i].attendies.splice(index)
+          }
+          events[i].save(function (err) {
+            if (err) return handleError(err);
+            // saved!
+          })
+        }
+
+      }
+
+    })
+
+    //Event.updateMany( {}, { $pullAll: {attendies: [email] } } )
 
     await AlumniBasicDetails.findOneAndRemove({_id: id },
       function (err, docs) {
@@ -521,7 +528,7 @@ let transport = nodemailer.createTransport({
     temp = temp.toLowerCase()
     var end;
     if(temp!=="all"){
-      Event.findById({_id : req.body.recipients},async function(err,event){
+      await Event.findById({_id : req.body.recipients},async function(err,event){
         if(err) {
           //console.log("inside");
           console.log(err);
@@ -548,24 +555,30 @@ let transport = nodemailer.createTransport({
         email.push(alumni[i].alumniEmail);
       }
     }
+    if(email.length>=1){
+      console.log("Emails are : ",email);
+      const message = {
+        from: "testalumniapp@gmail.com", // Sender address
+        to: email,         // recipients
+        subject: req.body.subject, // Subject line
+        text: req.body.message // Plain text body
+      };
+      transport.sendMail(message, function(err, info) {
+          if (err) {
+            console.log(err)
+            res.send(err);
+          } else {
+            console.log('mail has sent.');
+            console.log(info);
+            res.redirect("/admin/details");
+          }
+      });
+    }
+    else{
+      //text = "No Attendies for this event!!\n" + 'Please click on the below link to go back to the page: \nhttp:\/\/' + req.headers.host + '\/admin' + '\/details\/' + '.\n'
+      res.send("No Attendies for this event!!")
+    }
 
-    console.log(email);
-    const message = {
-      from: "testalumniapp@gmail.com", // Sender address
-      to: email,         // recipients
-      subject: req.body.subject, // Subject line
-      text: req.body.message // Plain text body
-    };
-    transport.sendMail(message, function(err, info) {
-        if (err) {
-          console.log(err)
-          res.send(err);
-        } else {
-          console.log('mail has sent.');
-          console.log(info);
-          res.redirect("/admin/details");
-        }
-    });
   
   });
 
