@@ -1,6 +1,2 @@
-<<<<<<< HEAD
 # finalProject
-=======
-# Alumni-Tracking
-# AlumniTrackingDuplicate
->>>>>>> bd5102a38a195cc780d136133078667941b408c9
+The project is about Alumni Association Website.The colleges could easily keep track of their alumni.
