@@ -453,11 +453,12 @@
 
 
 
-
+                                
                                 <% var index; %>
                                 
                                 <% index =  i %>
 
+                                <% if(records[i].isVerified===true){ %>
                                 <a class="list-group-item" onclick="sendData('<%= index %>')" id="point">
                                     <div class="media">
                                         <div class="pull-left">
@@ -481,7 +482,8 @@
                                         </div>
 
                                     </div>
-                                </a>   
+                                </a>  
+                                <%}%> 
                             <%}%> 
                         </div>
                     </div>
