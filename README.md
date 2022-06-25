@@ -3,18 +3,15 @@
 </h1>
 
 
-<h2> Stack Used </h2>
+# Stack Used
 <ul>
-  <li>HTML5</li>  
-  
+  <li>HTML5</li> 
+  <li>CSS3</li>
+  <li>Bootstrap</li>
+  <li>Javascript</li>
+  <li>jQuery</li>
+  <li>Node.js</li>
+  <li>MongoDb</li>
 </ul>
-- CSS3
-- Javascript
-- jQuery
-- Bootstrap
-- Node.js
-- MongoDb
-
-
 
 
