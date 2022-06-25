@@ -1,3 +1,3 @@
-<p align="center">
-  <b>Alumni Association Website</b>
-</p>
+<h1 align="center">
+  Alumni Association Website</b>
+</h1>
