@@ -14,4 +14,8 @@
   <li>MongoDb</li>
 </ul>
 
+# Inspiration
+Each alumni network maintains a directory of every graduate's career, residence, and contact information. It’s typical for alumni to organize networking events, support fundraising efforts for their institution, and serve as exemplars of their university and program. <br/>
+Alumni on staying in touch with their network, they can build professional connections, organize and take part in reunion activities, give back to their college, or simply maintain a connection with people who have successfully completed the same educational process. <br/>
+A website for the college would help the undergraduates to get connected with the Alumni and take some motivations from them. This alumni network can also provide opportunities for members to stay involved and engaged at the regional level, connecting them with other grads who share cultural backgrounds and interests.
 
