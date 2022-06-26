@@ -12,6 +12,8 @@
   <li>jQuery</li>
   <li>Node.js</li>
   <li>MongoDb</li>
+  <li>Heroku</li>
+  <li>Cloudinary</li>
 </ul>
 
 # Inspiration
