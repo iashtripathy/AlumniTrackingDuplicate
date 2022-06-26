@@ -54,7 +54,24 @@
   <li>
     Alumni can search for their peers in using the websites Find Alumni section. Only few details would be visible to the alumni if he/she isn't logged in. Upon logged in he/she would be able to find certain details like facebook,twitter,linkedin account and they can connect with them. 
   </li>
+  <li>
+    Both Admin and Alumni can update their passwords.
+  </li>
 </ol>
 
-
-
+# Authentication,Authorization and Security
+<ul>
+  <li>
+    JWT tokens has been used to maintain the state of the user.
+  </li>
+  <li>
+    During registration of Alumni an Email will be send to the registered Email address. Only upon successful verification the Alumni would be registered.
+  </li>
+  <li>
+    Passwords are stored in the database in the hashed format.
+  </li>
+ </ul>
+ 
+# Hosting
+The website is hosted in heroku.</br>
+[a link](http://protected-oasis-49361.herokuapp.com/)
