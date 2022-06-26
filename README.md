@@ -32,7 +32,7 @@
 </ul>
 
 # Features
-<ol>
+<ul>
   <li>
     Alumni can create and update their profile.
   </li>
@@ -57,7 +57,7 @@
   <li>
     Both Admin and Alumni can update their passwords.
   </li>
-</ol>
+</ul>
 
 # Authentication,Authorization and Security
 <ul>
@@ -74,4 +74,4 @@
  
 # Hosting
 The website is hosted in heroku.</br>
-[a link](http://protected-oasis-49361.herokuapp.com/)
+[Click here to visit website](http://protected-oasis-49361.herokuapp.com/)
